@@ -10,6 +10,68 @@ namespace FpgaFlashLoader
 {
     public class Program
     {
+        private class ReadHelper
+        {
+            public Stream InputStream { get; private set; }
+            public int BufferSize { get; private set; }
+            private byte[] readBuffer;
+            private int readBufferOffset;
+            private int readBufferLength;
+
+            public ReadHelper(Stream inputStream, int bufferSize)
+            {
+                InputStream = inputStream;
+                BufferSize = bufferSize;
+                readBuffer = new byte[BufferSize];
+                readBufferOffset = 0;
+                readBufferLength = 0;
+            }
+
+            private int Min(int a, int b)
+            {
+                return (a < b) ? a : b;
+            }
+
+            private int CopyBufferBytes(byte[] buffer, int offset, int count)
+            {
+                int bytesToCopy = Min(count, readBufferLength - readBufferOffset);
+
+                for (int counter = 0; counter < bytesToCopy; ++counter)
+                {
+                    buffer[offset + counter] = readBuffer[readBufferOffset + counter];
+                }
+                readBufferOffset += bytesToCopy;
+                return bytesToCopy;
+            }
+
+            private int RefillBuffer()
+            {
+                readBufferLength = InputStream.Read(readBuffer, 0, readBuffer.Length);
+                readBufferOffset = 0;
+                return readBufferLength;
+            }
+
+            public int FullyRead(byte[] buffer, int offset, int count)
+            {
+                int bytesCopied = 0;
+                while (true)
+                {
+                    bytesCopied += CopyBufferBytes(buffer, offset + bytesCopied, count - bytesCopied);
+
+                    if (bytesCopied == count)
+                    {
+                        break;
+                    }
+
+                    if (RefillBuffer() == 0)
+                    {
+                        break;
+                    }
+                }
+                return bytesCopied;
+            }
+        }
+
         // http://www.xilinx.com/support/documentation/user_guides/ug333.pdf
 
         enum SpiCommands : byte
@@ -54,27 +116,10 @@ namespace FpgaFlashLoader
             throw new SpiException("Timeout waiting for ISF READY status");
         }
 
-        public static int FullyRead(Stream inputStream, byte[] buffer, int offset, int count)
-        {
-            int totalBytesRead;
-
-            totalBytesRead = 0;
-            while (totalBytesRead < count)
-            {
-                var bytesRead = inputStream.Read(buffer, offset + totalBytesRead, count - totalBytesRead);
-                if (bytesRead == 0)
-                {
-                    // End of stream, as much data as you're gonna get
-                    break;
-                }
-                totalBytesRead += bytesRead;
-            }
-            return totalBytesRead;
-        }
-
         public static void UploadImage(Stream inputStream, SPI spi, int address)
         {
             int currentAddress = address;
+            var readHelper = new ReadHelper(inputStream, 256);
 
             // Create a buffer the size of the SRAM area in the FPGA
             // The extra 4 bytes is for the transfer command and the address
@@ -93,7 +138,7 @@ namespace FpgaFlashLoader
             {
                 // Read a page from the stream
 
-                var bytesRead = FullyRead(inputStream, readBuffer, 4, SramPageBufferSize);
+                var bytesRead = readHelper.FullyRead(readBuffer, 4, SramPageBufferSize);
                 if (bytesRead == 0)
                 {
                     // All copied. You rule!
