@@ -10,6 +10,26 @@ namespace FpgaFlashLoader
 {
     public class Program
     {
+        public interface ISimpleReadStream
+        {
+            int Read(byte[] buffer, int offset, int count);
+        }
+
+        public class StreamSimpleReadStream : ISimpleReadStream
+        {
+            private Stream baseStream;
+
+            public StreamSimpleReadStream(Stream baseStream)
+            {
+                this.baseStream = baseStream;
+            }
+
+            public int Read(byte[] buffer, int offset, int count)
+            {
+                return baseStream.Read(buffer, offset, count);
+            }
+        }
+
         // http://www.xilinx.com/support/documentation/user_guides/ug333.pdf
 
         enum SpiCommands : byte
@@ -54,7 +74,7 @@ namespace FpgaFlashLoader
             throw new SpiException("Timeout waiting for ISF READY status");
         }
 
-        public static int FullyRead(Stream inputStream, byte[] buffer, int offset, int count)
+        public static int FullyRead(ISimpleReadStream inputStream, byte[] buffer, int offset, int count)
         {
             int totalBytesRead;
 
@@ -72,7 +92,7 @@ namespace FpgaFlashLoader
             return totalBytesRead;
         }
 
-        public static void UploadImage(Stream inputStream, SPI spi, int address)
+        public static void UploadImage(ISimpleReadStream inputStream, SPI spi, int address)
         {
             int currentAddress = address;
 
@@ -175,7 +195,7 @@ namespace FpgaFlashLoader
 
             using (var inputStream = new FileStream(fpgaImagePath, FileMode.Open))
             {
-                UploadImage(inputStream, spi, 0x020000);
+                UploadImage(new StreamSimpleReadStream(inputStream), spi, 0x020000);
             }
         }
     }
