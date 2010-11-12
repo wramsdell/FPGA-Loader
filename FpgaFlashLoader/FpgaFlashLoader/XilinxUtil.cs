@@ -70,7 +70,7 @@ namespace FpgaFlashLoader
             return totalBytesRead;
         }
 
-        public static void UploadImage(ISimpleReadStream inputStream, SPI spi, int address)
+        public static void UploadBitstream(ISimpleReadStream inputStream, SPI spi, int address)
         {
             int currentAddress = address;
 

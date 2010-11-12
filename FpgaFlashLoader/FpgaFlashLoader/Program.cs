@@ -38,7 +38,7 @@ namespace FpgaFlashLoader
 
             try
             {
-                XilinxUtil.UploadImage(new MultiBinaryResourceSimpleReadStream(GetResources()), spi, 0x020000);
+                XilinxUtil.UploadBitstream(new MultiBinaryResourceSimpleReadStream(GetResources()), spi, 0x020000);
             }
             catch
             {
