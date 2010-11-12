@@ -34,8 +34,10 @@ namespace FpgaFlashLoader
         {
             Bitstream_bin4 = -31366,
             Bitstream_bin2 = -20236,
+            Bitstream_bin6 = -10243,
             Bitstream_bin3 = -7896,
             Bitstream_bin1 = 3891,
+            Bitstream_bin5 = 19749,
         }
     }
 }

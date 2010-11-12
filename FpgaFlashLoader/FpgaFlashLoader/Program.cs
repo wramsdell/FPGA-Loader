@@ -5,6 +5,7 @@ using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
 using SecretLabs.NETMF.Hardware;
 using SecretLabs.NETMF.Hardware.Netduino;
+using System.Collections;
 
 namespace FpgaFlashLoader
 {
@@ -27,6 +28,50 @@ namespace FpgaFlashLoader
             public int Read(byte[] buffer, int offset, int count)
             {
                 return baseStream.Read(buffer, offset, count);
+            }
+        }
+
+        public class MultiBinaryResourceSimpleReadStream : ISimpleReadStream
+        {
+            private IEnumerator resourceIds;
+            private byte[] currentByteArray;
+            private int currentByteArrayOffset;
+
+            public MultiBinaryResourceSimpleReadStream(IEnumerator resourceIds)
+            {
+                this.resourceIds = resourceIds;
+                SetUpNextByteArray();
+            }
+
+            private void SetUpNextByteArray()
+            {
+                currentByteArray = null;
+                currentByteArray = resourceIds.MoveNext() ? Resources.GetBytes((Resources.BinaryResources)resourceIds.Current) : null;
+                currentByteArrayOffset = 0;
+            }
+
+            public int Read(byte[] buffer, int offset, int count)
+            {
+                if (currentByteArray == null)
+                {
+                    return 0;
+                }
+
+                int bytesToCopy = System.Math.Min(count, currentByteArray.Length - currentByteArrayOffset);
+
+                for (int counter = 0; counter < bytesToCopy; ++counter)
+                {
+                    buffer[offset + counter] = currentByteArray[currentByteArrayOffset + counter];
+                }
+
+                currentByteArrayOffset += bytesToCopy;
+
+                if (currentByteArrayOffset >= currentByteArray.Length)
+                {
+                    SetUpNextByteArray();
+                }
+
+                return bytesToCopy;
             }
         }
 
@@ -177,6 +222,16 @@ namespace FpgaFlashLoader
             }
         }
 
+        public static IEnumerator GetResources()
+        {
+            yield return Resources.BinaryResources.Bitstream_bin1;
+            yield return Resources.BinaryResources.Bitstream_bin2;
+            yield return Resources.BinaryResources.Bitstream_bin3;
+            yield return Resources.BinaryResources.Bitstream_bin4;
+            yield return Resources.BinaryResources.Bitstream_bin5;
+            yield return Resources.BinaryResources.Bitstream_bin6;
+        }
+
         public static void Main()
         {
             SPI.Configuration spiConfig = new SPI.Configuration(
@@ -191,12 +246,7 @@ namespace FpgaFlashLoader
             );
             SPI spi = new SPI(spiConfig);
 
-            string fpgaImagePath = @"\SD\Sample.bin";
-
-            using (var inputStream = new FileStream(fpgaImagePath, FileMode.Open))
-            {
-                UploadImage(new StreamSimpleReadStream(inputStream), spi, 0x020000);
-            }
+            UploadImage(new MultiBinaryResourceSimpleReadStream(GetResources()), spi, 0x020000);
         }
     }
 }

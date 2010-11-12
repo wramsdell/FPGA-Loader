@@ -130,4 +130,10 @@
   <data name="Bitstream_bin4" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Bitstream\Bitstream.bin.4;System.Byte[], mscorlib, Version=4.1.2821.0, Culture=neutral, PublicKeyToken=null</value>
   </data>
+  <data name="Bitstream_bin5" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Bitstream\Bitstream.bin.5;System.Byte[], mscorlib, Version=4.1.2821.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="Bitstream_bin6" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Bitstream\Bitstream.bin.6;System.Byte[], mscorlib, Version=4.1.2821.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
 </root>
