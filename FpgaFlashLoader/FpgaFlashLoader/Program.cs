@@ -116,9 +116,7 @@ namespace FpgaFlashLoader
             throw new SpiException("Timeout waiting for ISF READY status");
         }
 
-        public delegate void PageUploadedDelegate(int startAddress, int currentAddress);
-
-        public static void UploadImage(Stream inputStream, SPI spi, int address, PageUploadedDelegate pageUploadedDelegate)
+        public static void UploadImage(Stream inputStream, SPI spi, int address)
         {
             int currentAddress = address;
             var readHelper = new ReadHelper(inputStream, 256);
@@ -194,7 +192,7 @@ namespace FpgaFlashLoader
                     }
                     else
                     {
-                        pageUploadedDelegate(address, currentAddress);
+                        // Page successfully uploaded
                     }
                 } while (verifyFailed);
 
@@ -222,7 +220,7 @@ namespace FpgaFlashLoader
 
             using (var inputStream = new FileStream(fpgaImagePath, FileMode.Open))
             {
-                UploadImage(inputStream, spi, 0x020000, delegate(int startAddress, int currentAddress) { Debug.Print("Uploaded page " + currentAddress); });
+                UploadImage(inputStream, spi, 0x020000);
             }
         }
     }
