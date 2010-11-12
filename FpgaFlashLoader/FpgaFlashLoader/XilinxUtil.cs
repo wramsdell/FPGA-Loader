@@ -1,3 +1,5 @@
+// Copyright (C) Prototype Engineering, LLC. All rights reserved.
+
 using System;
 using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;

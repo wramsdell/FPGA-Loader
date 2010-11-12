@@ -1,3 +1,5 @@
+// Copyright (C) Prototype Engineering, LLC. All rights reserved.
+
 using System.Collections;
 
 namespace FpgaFlashLoader

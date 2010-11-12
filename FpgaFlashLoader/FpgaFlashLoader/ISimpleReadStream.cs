@@ -1,4 +1,6 @@
-﻿namespace FpgaFlashLoader
+﻿// Copyright (C) Prototype Engineering, LLC. All rights reserved.
+
+namespace FpgaFlashLoader
 {
     public interface ISimpleReadStream
     {

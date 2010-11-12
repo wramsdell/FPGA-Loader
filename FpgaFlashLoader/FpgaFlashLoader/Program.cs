@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿// Copyright (C) Prototype Engineering, LLC. All rights reserved.
+
+using System.Collections;
 using Microsoft.SPOT.Hardware;
 using SecretLabs.NETMF.Hardware.Netduino;
 

@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿// Copyright (C) Prototype Engineering, LLC. All rights reserved.
+
+using System.IO;
 
 namespace FpgaFlashLoader
 {
