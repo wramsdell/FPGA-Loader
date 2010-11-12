@@ -18,11 +18,60 @@ namespace FpgaFlashLoader
             yield return Resources.BinaryResources.Bitstream_bin6;
         }
 
+        private class UploadStatusIndicator
+        {
+            private OutputPort redFpgaLed;
+            private OutputPort greenFpgaLed;
+            private UploadStatus _status;
+
+            public enum UploadStatus
+            {
+                None,
+                Uploading,
+                Succeeded,
+                Failed
+            }
+
+            public UploadStatus Status
+            {
+                get { return _status; }
+                set
+                {
+                    _status = value;
+                    switch (_status)
+                    {
+                        case UploadStatus.None:
+                            redFpgaLed.Write(false);
+                            greenFpgaLed.Write(false);
+                            break;
+                        case UploadStatus.Failed:
+                            redFpgaLed.Write(true);
+                            greenFpgaLed.Write(false);
+                            break;
+                        case UploadStatus.Succeeded:
+                            redFpgaLed.Write(false);
+                            greenFpgaLed.Write(true);
+                            break;
+                        case UploadStatus.Uploading:
+                            redFpgaLed.Write(true);
+                            greenFpgaLed.Write(true);
+                            break;
+                    }
+                }
+            }
+
+            public UploadStatusIndicator()
+            {
+                redFpgaLed = new OutputPort(Pins.GPIO_PIN_D1, false);
+                greenFpgaLed = new OutputPort(Pins.GPIO_PIN_D2, false);
+                Status = UploadStatus.None;
+            }
+        }
+
         public static void Main()
         {
             OutputPort onboardLed = new OutputPort(Pins.ONBOARD_LED, true);
-            OutputPort redFpgaLed = new OutputPort(Pins.GPIO_PIN_D1, false);
-            OutputPort greenFpgaLed = new OutputPort(Pins.GPIO_PIN_D2, false);
+            var uploadStatusIndicator = new UploadStatusIndicator();
 
             SPI.Configuration spiConfig = new SPI.Configuration(
                 Pins.GPIO_PIN_D0,
@@ -38,23 +87,21 @@ namespace FpgaFlashLoader
 
             try
             {
+                uploadStatusIndicator.Status = UploadStatusIndicator.UploadStatus.Uploading;
                 XilinxUtil.UploadBitstream(new MultiBinaryResourceSimpleReadStream(GetResources()), spi, 0x020000);
+                uploadStatusIndicator.Status = UploadStatusIndicator.UploadStatus.Succeeded;
             }
             catch
             {
-                // Red LED is lit if the image failed to upload
+                // Any exception is a failed upload
 
-                redFpgaLed.Write(true);
+                uploadStatusIndicator.Status = UploadStatusIndicator.UploadStatus.Failed;
                 throw;
             }
             finally
             {
                 onboardLed.Write(false);
             }
-
-            // Green LED is lit if the image was successfully uploaded
-
-            greenFpgaLed.Write(true);
         }
     }
 }
