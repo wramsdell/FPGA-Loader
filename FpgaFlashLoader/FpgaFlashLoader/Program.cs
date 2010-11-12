@@ -234,6 +234,10 @@ namespace FpgaFlashLoader
 
         public static void Main()
         {
+            OutputPort onboardLed = new OutputPort(Pins.ONBOARD_LED, false);
+            OutputPort redFpgaLed = new OutputPort(Pins.GPIO_PIN_D1, false);
+            OutputPort greenFpgaLed = new OutputPort(Pins.GPIO_PIN_D2, false);
+
             SPI.Configuration spiConfig = new SPI.Configuration(
                 Pins.GPIO_PIN_D0,
                 false,
@@ -246,7 +250,21 @@ namespace FpgaFlashLoader
             );
             SPI spi = new SPI(spiConfig);
 
-            UploadImage(new MultiBinaryResourceSimpleReadStream(GetResources()), spi, 0x020000);
+            try
+            {
+                UploadImage(new MultiBinaryResourceSimpleReadStream(GetResources()), spi, 0x020000);
+            }
+            catch
+            {
+                // Red LED is lit if the image failed to upload
+
+                redFpgaLed.Write(true);
+                throw;
+            }
+
+            // Green LED is lit if the image was successfully uploaded
+
+            greenFpgaLed.Write(true);
         }
     }
 }
