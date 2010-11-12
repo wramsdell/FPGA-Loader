@@ -22,7 +22,6 @@ namespace FpgaFlashLoader
         {
             private OutputPort redFpgaLed;
             private OutputPort greenFpgaLed;
-            private UploadStatus _status;
 
             public enum UploadStatus
             {
@@ -34,11 +33,9 @@ namespace FpgaFlashLoader
 
             public UploadStatus Status
             {
-                get { return _status; }
                 set
                 {
-                    _status = value;
-                    switch (_status)
+                    switch (value)
                     {
                         case UploadStatus.None:
                             redFpgaLed.Write(false);
