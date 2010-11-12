@@ -243,7 +243,7 @@ namespace FpgaFlashLoader
 
         public static void Main()
         {
-            OutputPort onboardLed = new OutputPort(Pins.ONBOARD_LED, false);
+            OutputPort onboardLed = new OutputPort(Pins.ONBOARD_LED, true);
             OutputPort redFpgaLed = new OutputPort(Pins.GPIO_PIN_D1, false);
             OutputPort greenFpgaLed = new OutputPort(Pins.GPIO_PIN_D2, false);
 
@@ -269,6 +269,10 @@ namespace FpgaFlashLoader
 
                 redFpgaLed.Write(true);
                 throw;
+            }
+            finally
+            {
+                onboardLed.Write(false);
             }
 
             // Green LED is lit if the image was successfully uploaded
