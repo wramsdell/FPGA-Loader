@@ -165,6 +165,15 @@ namespace FpgaFlashLoader
 
                     break;
                 }
+                else if (bytesRead < SramPageBufferSize)
+                {
+                    // Set the unused bytes to known values
+
+                    for (int offset = 4 + bytesRead; offset < SramPageBufferSize + 4; ++offset)
+                    {
+                        readBuffer[offset] = 0xFF;
+                    }
+                }
 
                 // Put in the current address
 
