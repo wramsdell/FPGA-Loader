@@ -23,14 +23,13 @@ namespace Filesplit
                     byte[] buffer = new byte[1024];
                     int currentFile = 1;
                     bool done = false;
+                    string tempPathname = Path.GetTempFileName();
                     do
                     {
+                        int totalBytesCopied = 0;
                         string thisFilename = args[0] + ("." + currentFile);
-                        System.Console.WriteLine("{0}", thisFilename);
-                        using (var outputStream = new FileStream(thisFilename, FileMode.Create))
+                        using (var outputStream = new FileStream(tempPathname, FileMode.Create))
                         {
-                            int totalBytesCopied = 0;
-
                             while (totalBytesCopied < partSize)
                             {
                                 int bytesRead = inputStream.Read(buffer, 0, Math.Min(buffer.Length, partSize - totalBytesCopied));
@@ -43,6 +42,19 @@ namespace Filesplit
                                 outputStream.Write(buffer, 0, bytesRead);
                                 totalBytesCopied += bytesRead;
                             }
+                        }
+                        if (totalBytesCopied > 0)
+                        {
+                            if (File.Exists(thisFilename))
+                            {
+                                File.Delete(thisFilename);
+                            }
+                            File.Move(tempPathname, thisFilename);
+                            System.Console.WriteLine("{0}", thisFilename);
+                        }
+                        else
+                        {
+                            File.Delete(tempPathname);
                         }
                         ++currentFile;
                     } while (!done);
