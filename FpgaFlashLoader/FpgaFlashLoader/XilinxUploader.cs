@@ -51,6 +51,7 @@ namespace FpgaFlashLoader
         }
 
         private static readonly byte StatusRegisterReadyMask = 0x80;
+        private static readonly byte StatusRegisterCompareMask = 0x40;
         private static readonly byte StatusRegisterMemorySizeMask = 0x3C;
 
         private enum IsfMemorySize : byte
@@ -176,7 +177,7 @@ namespace FpgaFlashLoader
                     // Wait until ready, and when it is, the compare result
                     // comes back in bit 6. Set is bad.
 
-                    verifyFailed = ((WaitUntilReady() & 0x40) != 0);
+                    verifyFailed = ((WaitUntilReady() & StatusRegisterCompareMask) != 0);
                     if (verifyFailed)
                     {
                         Debug.Print("Failed to write block address " + currentAddress);
