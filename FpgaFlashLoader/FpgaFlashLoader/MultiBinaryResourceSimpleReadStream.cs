@@ -8,6 +8,7 @@ namespace FpgaFlashLoader
     {
         private IEnumerator resourceIds;
         private byte[] currentByteArray;
+        private int currentByteArrayBytesRemaining;
         private int currentByteArrayOffset;
 
         public MultiBinaryResourceSimpleReadStream(IEnumerator resourceIds)
@@ -20,6 +21,7 @@ namespace FpgaFlashLoader
         {
             currentByteArray = null;
             currentByteArray = resourceIds.MoveNext() ? Resources.GetBytes((Resources.BinaryResources)resourceIds.Current) : null;
+            currentByteArrayBytesRemaining = (currentByteArray != null) ? currentByteArray.Length : 0;
             currentByteArrayOffset = 0;
         }
 
@@ -30,7 +32,7 @@ namespace FpgaFlashLoader
                 return 0;
             }
 
-            int bytesToCopy = System.Math.Min(count, currentByteArray.Length - currentByteArrayOffset);
+            int bytesToCopy = (count < currentByteArrayBytesRemaining) ? count : currentByteArrayBytesRemaining;
 
             for (int counter = 0; counter < bytesToCopy; ++counter)
             {
@@ -38,8 +40,9 @@ namespace FpgaFlashLoader
             }
 
             currentByteArrayOffset += bytesToCopy;
+            currentByteArrayBytesRemaining -= bytesToCopy;
 
-            if (currentByteArrayOffset >= currentByteArray.Length)
+            if (currentByteArrayBytesRemaining == 0)
             {
                 SetUpNextByteArray();
             }
