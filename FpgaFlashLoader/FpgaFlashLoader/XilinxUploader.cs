@@ -11,6 +11,7 @@ namespace FpgaFlashLoader
         private SPI spi;
         private byte[] statusBuffer;
         private static readonly int SramPageBufferSize = 264;
+        private static readonly int MaxPageWriteRetries = 3;
 
         public XilinxUploader(SPI spi)
         {
@@ -180,11 +181,11 @@ namespace FpgaFlashLoader
                     verifyFailed = ((WaitUntilReady() & StatusRegisterCompareMask) != 0);
                     if (verifyFailed)
                     {
-                        Debug.Print("Failed to write block address " + currentAddress);
+                        Debug.Print("Failed to write page address " + currentAddress);
                         ++verifyFailedCount;
-                        if (verifyFailedCount == 3)
+                        if (verifyFailedCount == MaxPageWriteRetries)
                         {
-                            throw new XilinxUploaderException("Failed to write block address " + currentAddress);
+                            throw new XilinxUploaderException("Failed to write page address " + currentAddress);
                         }
                     }
                     else
