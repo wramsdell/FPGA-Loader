@@ -6,8 +6,18 @@ using Microsoft.SPOT.Hardware;
 
 namespace FpgaFlashLoader
 {
-    class XilinxUtil
+    class XilinxUploader
     {
+        private SPI spi;
+        private byte[] statusBuffer;
+        private static readonly int SramPageBufferSize = 264;
+
+        public XilinxUploader(SPI spi)
+        {
+            this.spi = spi;
+            statusBuffer = new byte[2];
+        }
+
         // http://www.xilinx.com/support/documentation/user_guides/ug333.pdf
 
         private enum SpiCommands : byte
@@ -17,39 +27,63 @@ namespace FpgaFlashLoader
             StatusRegisterRead = 0xD7,
         }
 
-        public class SpiException : Exception
+        public class XilinxUploaderException : Exception
         {
-            public SpiException()
+            public XilinxUploaderException()
                 : base()
             {
             }
-            public SpiException(string message)
+            public XilinxUploaderException(string message)
                 : base(message)
             {
             }
-            public SpiException(string message, Exception inner)
+            public XilinxUploaderException(string message, Exception inner)
                 : base(message, inner)
             {
             }
         }
 
-        private static readonly int SramPageBufferSize = 264;
-
-        private static byte WaitUntilReady(SPI spi)
+        private byte GetStatusRegister()
         {
-            var buffer = new byte[2];
+            statusBuffer[0] = (byte)SpiCommands.StatusRegisterRead;
+            spi.WriteRead(statusBuffer, statusBuffer);
+            return statusBuffer[1];
+        }
 
+        private static readonly byte StatusRegisterReadyMask = 0x80;
+        private static readonly byte StatusRegisterMemorySizeMask = 0x3C;
+
+        private enum IsfMemorySize : byte
+        {
+            Unknown = 0,
+            OneMegabit = 0x0C0,
+        }
+
+        private IsfMemorySize GetFpgaMemorySize()
+        {
+            return (IsfMemorySize)(GetStatusRegister() & StatusRegisterMemorySizeMask);
+        }
+
+        public bool IsShieldInBootloaderMode()
+        {
+            // If the SPI responds to the StatusRegisterRead command and
+            // returns the expected memory size, we must be cool.
+
+            return GetFpgaMemorySize() == IsfMemorySize.OneMegabit;
+        }
+
+        private byte WaitUntilReady()
+        {
             for (int counter = 0; counter < 100; ++counter)
             {
-                buffer[0] = (byte)SpiCommands.StatusRegisterRead;
-                spi.WriteRead(buffer, buffer);
-                if ((buffer[1] & 0x80) != 0)
+                var statusRegister = GetStatusRegister();
+                if ((statusRegister & StatusRegisterReadyMask) != 0)
                 {
-                    return buffer[1];
+                    return statusRegister;
                 }
             }
 
-            throw new SpiException("Timeout waiting for ISF READY status");
+            throw new XilinxUploaderException("Timeout waiting for ISF READY status");
         }
 
         private static int FullyRead(ISimpleReadStream inputStream, byte[] buffer, int offset, int count)
@@ -70,7 +104,7 @@ namespace FpgaFlashLoader
             return totalBytesRead;
         }
 
-        public static void UploadBitstream(ISimpleReadStream inputStream, SPI spi, int address)
+        public void UploadBitstream(ISimpleReadStream inputStream, int address)
         {
             int currentAddress = address;
 
@@ -125,7 +159,7 @@ namespace FpgaFlashLoader
                 {
                     // Wait until ready
 
-                    WaitUntilReady(spi);
+                    WaitUntilReady();
 
                     // Write it to the ISF
 
@@ -133,7 +167,7 @@ namespace FpgaFlashLoader
 
                     // Wait until ready
 
-                    WaitUntilReady(spi);
+                    WaitUntilReady();
 
                     // Verify it wrote
 
@@ -142,14 +176,14 @@ namespace FpgaFlashLoader
                     // Wait until ready, and when it is, the compare result
                     // comes back in bit 6. Set is bad.
 
-                    verifyFailed = ((WaitUntilReady(spi) & 0x40) != 0);
+                    verifyFailed = ((WaitUntilReady() & 0x40) != 0);
                     if (verifyFailed)
                     {
                         Debug.Print("Failed to write block address " + currentAddress);
                         ++verifyFailedCount;
                         if (verifyFailedCount == 3)
                         {
-                            throw new SpiException("Failed to write block address " + currentAddress);
+                            throw new XilinxUploaderException("Failed to write block address " + currentAddress);
                         }
                     }
                     else

@@ -3,6 +3,7 @@
 using System.Collections;
 using Microsoft.SPOT.Hardware;
 using SecretLabs.NETMF.Hardware.Netduino;
+using System.Threading;
 
 namespace FpgaFlashLoader
 {
@@ -68,7 +69,6 @@ namespace FpgaFlashLoader
         public static void Main()
         {
             OutputPort onboardLed = new OutputPort(Pins.ONBOARD_LED, true);
-            var uploadStatusIndicator = new UploadStatusIndicator();
 
             SPI.Configuration spiConfig = new SPI.Configuration(
                 Pins.GPIO_PIN_D0,
@@ -81,22 +81,40 @@ namespace FpgaFlashLoader
                 SPI_Devices.SPI1
             );
             SPI spi = new SPI(spiConfig);
+            var uploader = new XilinxUploader(spi);
 
-            try
+            if (uploader.IsShieldInBootloaderMode())
             {
-                uploadStatusIndicator.Status = UploadStatusIndicator.UploadStatus.Uploading;
-                XilinxUtil.UploadBitstream(new MultiBinaryResourceSimpleReadStream(GetResources()), spi, 0x020000);
-                uploadStatusIndicator.Status = UploadStatusIndicator.UploadStatus.Succeeded;
-            }
-            catch
-            {
-                // Any exception is a failed upload
+                var uploadStatusIndicator = new UploadStatusIndicator();
 
-                uploadStatusIndicator.Status = UploadStatusIndicator.UploadStatus.Failed;
-                throw;
+                try
+                {
+                    uploadStatusIndicator.Status = UploadStatusIndicator.UploadStatus.Uploading;
+                    uploader.UploadBitstream(new MultiBinaryResourceSimpleReadStream(GetResources()), 0x020000);
+                    uploadStatusIndicator.Status = UploadStatusIndicator.UploadStatus.Succeeded;
+                }
+                catch
+                {
+                    // Any exception is a failed upload
+
+                    uploadStatusIndicator.Status = UploadStatusIndicator.UploadStatus.Failed;
+                    throw;
+                }
+                finally
+                {
+                    onboardLed.Write(false);
+                }
             }
-            finally
+            else
             {
+                // Flash the onboard LED to indicate upload failure due to
+                // not being in bootstrapping mode
+
+                Thread.Sleep(500);
+                onboardLed.Write(false);
+                Thread.Sleep(500);
+                onboardLed.Write(true);
+                Thread.Sleep(500);
                 onboardLed.Write(false);
             }
         }

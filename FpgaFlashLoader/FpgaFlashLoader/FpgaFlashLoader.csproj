@@ -40,7 +40,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="StreamSimpleReadStream.cs" />
-    <Compile Include="XilinxUtil.cs" />
+    <Compile Include="XilinxUploader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.SPOT.Graphics" />
