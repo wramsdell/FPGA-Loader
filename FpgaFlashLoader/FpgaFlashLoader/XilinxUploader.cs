@@ -56,7 +56,7 @@ namespace FpgaFlashLoader
         private enum IsfMemorySize : byte
         {
             Unknown = 0,
-            OneMegabit = 0x0C0,
+            OneMegabit = 0x0C,
         }
 
         private IsfMemorySize GetFpgaMemorySize()
