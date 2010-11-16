@@ -42,12 +42,12 @@ namespace Filesplit
         static readonly string FirstFilename = "Bitstream.bin.1";
         static readonly string HelpText = @"Use this program to prepare your FPGA bitstream for deployment with FpgaFlashLoader.
 
-1. Get a bitstream from somewhere, or create one using the Xilinx tools. You should have a 54,702 byte file at the end of this process.
+1. Get a bitstream from somewhere, or create one using the Xilinx tools. This can be either a .bit file or a .bin file.
 2. Run this program on the file, with the filename in step 1 as an argument. For instance:
 
-{0} mybitstream.bin
+{0} mybitstream.bit
 
-   (provided your bitstream is in 'mybitstream.bin')
+   (provided your bitstream is in 'mybitstream.bit')
 
 3. This will process the bitstream as required for the FpgaFlashLoader utility, and you should see the output:
 
@@ -109,6 +109,14 @@ namespace Filesplit
                 int currentFile = 1;
                 bool done = false;
                 string tempPathname = Path.GetTempFileName();
+
+                // If it's a .bit file, skip the header
+
+                if (Path.GetExtension(args[0]).ToLower() == ".bit")
+                {
+                    SkipBitHeaderInfo(inputStream);
+                }
+
                 do
                 {
                     int totalBytesCopied = 0;
@@ -147,6 +155,48 @@ namespace Filesplit
 
             System.Console.WriteLine();
             System.Console.WriteLine("Your bitstream is ready. Use Visual Studio to rebuild and deploy your bitstream using the FpgaFlashLoader utility.");
+        }
+
+        private static int ReadTwoByteInt(Stream inputStream)
+        {
+            return (inputStream.ReadByte() << 8) | (inputStream.ReadByte());
+        }
+
+        // http://www.fpga-faq.com/FAQ_Pages/0026_Tell_me_about_bit_files.htm
+
+        private static void SkipBitHeaderInfo(Stream inputStream)
+        {
+            // Read two byte length, discard data
+
+            inputStream.Seek(ReadTwoByteInt(inputStream), SeekOrigin.Current);
+
+            // Read two byte length, discard one byte expected data 'a'
+
+            inputStream.Seek(ReadTwoByteInt(inputStream), SeekOrigin.Current);
+
+            // Read two byte length, discard data expected filename
+
+            inputStream.Seek(ReadTwoByteInt(inputStream), SeekOrigin.Current);
+
+            // Read one byte expected field type 'b', read two byte length, discard part name
+
+            inputStream.Seek(1, SeekOrigin.Current);
+            inputStream.Seek(ReadTwoByteInt(inputStream), SeekOrigin.Current);
+
+            // Read one byte expected field type 'c', read two byte length, discard date
+
+            inputStream.Seek(1, SeekOrigin.Current);
+            inputStream.Seek(ReadTwoByteInt(inputStream), SeekOrigin.Current);
+
+            // Read one byte expected field type 'd', read two byte length, discard time
+
+            inputStream.Seek(1, SeekOrigin.Current);
+            inputStream.Seek(ReadTwoByteInt(inputStream), SeekOrigin.Current);
+
+            // Read one byte expected field type 'e', read four byte length, four byte length is data length
+
+            inputStream.Seek(1, SeekOrigin.Current);
+            inputStream.Seek(4, SeekOrigin.Current);
         }
     }
 }
