@@ -3,6 +3,7 @@
 using System;
 using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
+using System.Collections;
 
 namespace FpgaFlashLoader
 {
@@ -10,7 +11,7 @@ namespace FpgaFlashLoader
     {
         private SPI spi;
         private byte[] statusBuffer;
-        private static readonly int SramPageBufferSize = 264;
+        public static readonly int SramPageBufferSize = 264;
         private static readonly int MaxPageWriteRetries = 3;
 
         public XilinxUploader(SPI spi)
@@ -88,25 +89,7 @@ namespace FpgaFlashLoader
             throw new XilinxUploaderException("Timeout waiting for ISF READY status");
         }
 
-        private static int FullyRead(ISimpleReadStream inputStream, byte[] buffer, int offset, int count)
-        {
-            int totalBytesRead;
-
-            totalBytesRead = 0;
-            while (totalBytesRead < count)
-            {
-                var bytesRead = inputStream.Read(buffer, offset + totalBytesRead, count - totalBytesRead);
-                if (bytesRead == 0)
-                {
-                    // End of stream, as much data as you're gonna get
-                    break;
-                }
-                totalBytesRead += bytesRead;
-            }
-            return totalBytesRead;
-        }
-
-        public void UploadBitstream(ISimpleReadStream inputStream, int address)
+        public void UploadBitstream(PageCollection pageCollection, int address)
         {
             int currentAddress = address;
 
@@ -123,25 +106,13 @@ namespace FpgaFlashLoader
 
             verifyBuffer[0] = (byte)SpiCommands.PageToBuffer1Compare;
 
-            while (true)
+            foreach (Page page in pageCollection)
             {
-                // Read a page from the stream
+                // Copy the page data to the upload buffer
 
-                var bytesRead = FullyRead(inputStream, readBuffer, 4, SramPageBufferSize);
-                if (bytesRead == 0)
+                for (int counter = 0; counter < SramPageBufferSize; ++counter)
                 {
-                    // All copied. You rule!
-
-                    break;
-                }
-                else if (bytesRead < SramPageBufferSize)
-                {
-                    // Set the unused bytes to known values
-
-                    for (int offset = 4 + bytesRead; offset < SramPageBufferSize + 4; ++offset)
-                    {
-                        readBuffer[offset] = 0xFF;
-                    }
+                    readBuffer[4 + counter] = page.Data[page.Offset + counter];
                 }
 
                 // Put in the current address

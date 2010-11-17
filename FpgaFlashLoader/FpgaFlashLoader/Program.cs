@@ -90,7 +90,7 @@ namespace FpgaFlashLoader
                 try
                 {
                     uploadStatusIndicator.Status = UploadStatusIndicator.UploadStatus.Uploading;
-                    uploader.UploadBitstream(new MultiBinaryResourceSimpleReadStream(GetResources()), 0x020000);
+                    uploader.UploadBitstream(new BinaryResourceCollectionPageCollection(GetResources()), 0x020000);
                     uploadStatusIndicator.Status = UploadStatusIndicator.UploadStatus.Succeeded;
                 }
                 catch
