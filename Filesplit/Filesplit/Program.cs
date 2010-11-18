@@ -39,6 +39,8 @@ namespace Filesplit
             NoSourceFilenameProvided
         }
 
+        static readonly int PageSize = 264;
+        static readonly byte PadByte = 0xFF;
         static readonly string FirstFilename = "Bitstream.bin.1";
         static readonly string HelpText = @"Use this program to prepare your FPGA bitstream for deployment with FpgaFlashLoader.
 
@@ -134,6 +136,16 @@ namespace Filesplit
                             }
                             outputStream.Write(buffer, 0, bytesRead);
                             totalBytesCopied += bytesRead;
+                        }
+
+                        if ((done) && ((totalBytesCopied % PageSize) > 0))
+                        {
+                            // Pad out to a multiple of PageSize
+
+                            for (int counter = 0; counter < (PageSize - (totalBytesCopied % PageSize)); ++counter)
+                            {
+                                outputStream.WriteByte(PadByte);
+                            }
                         }
                     }
                     if (totalBytesCopied > 0)
