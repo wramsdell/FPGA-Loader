@@ -93,37 +93,15 @@ namespace FpgaFlashLoader
         {
             int currentAddress = address;
 
-            // Create a buffer the size of the SRAM area in the FPGA
-            // The extra 4 bytes is for the transfer command and the address
-
-            var readBuffer = new byte[SramPageBufferSize + 4];
-
-            // Fill in the command
-
-            readBuffer[0] = (byte)SpiCommands.PageProgramThroughBuffer1;
-
-            var verifyBuffer = new byte[4];
-
-            verifyBuffer[0] = (byte)SpiCommands.PageToBuffer1Compare;
+            var commandBuffer = new byte[4];
 
             foreach (Page page in pageCollection)
             {
-                // Copy the page data to the upload buffer
-
-                for (int counter = 0; counter < SramPageBufferSize; ++counter)
-                {
-                    readBuffer[4 + counter] = page.Data[page.Offset + counter];
-                }
-
                 // Put in the current address
 
-                readBuffer[1] = (byte)(currentAddress >> 16);
-                readBuffer[2] = (byte)(currentAddress >> 8);
-                readBuffer[3] = (byte)(currentAddress >> 0);
-
-                verifyBuffer[1] = (byte)(currentAddress >> 16);
-                verifyBuffer[2] = (byte)(currentAddress >> 8);
-                verifyBuffer[3] = (byte)(currentAddress >> 0);
+                commandBuffer[1] = (byte)(currentAddress >> 16);
+                commandBuffer[2] = (byte)(currentAddress >> 8);
+                commandBuffer[3] = (byte)(currentAddress >> 0);
 
                 bool verifyFailed = false;
                 int verifyFailedCount = 0;
@@ -136,7 +114,9 @@ namespace FpgaFlashLoader
 
                     // Write it to the ISF
 
-                    spi.Write(readBuffer);
+                    commandBuffer[0] = (byte)SpiCommands.PageProgramThroughBuffer1;
+
+                    spi.Write(commandBuffer, 0, commandBuffer.Length, page.Data, page.Offset, SramPageBufferSize);
 
                     // Wait until ready
 
@@ -144,7 +124,9 @@ namespace FpgaFlashLoader
 
                     // Verify it wrote
 
-                    spi.Write(verifyBuffer);
+                    commandBuffer[0] = (byte)SpiCommands.PageToBuffer1Compare;
+
+                    spi.Write(commandBuffer);
 
                     // Wait until ready, and when it is, the compare result
                     // comes back in bit 6. Set is bad.
