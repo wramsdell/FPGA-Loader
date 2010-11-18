@@ -52,7 +52,7 @@ namespace FpgaFlashLoader
             ChipSelectInactive();
         }
 
-        internal void Write(byte[] writeBuffer1, int writeBuffer1Offset, int writeBuffer1Length, byte[] writeBuffer2, int writeBuffer2Offset, int writeBuffer2Length)
+        public void Write(byte[] writeBuffer1, int writeBuffer1Offset, int writeBuffer1Length, byte[] writeBuffer2, int writeBuffer2Offset, int writeBuffer2Length)
         {
             ChipSelectActive();
             spi.WriteRead(writeBuffer1, writeBuffer1Offset, writeBuffer1Length, readBuffer, 0, writeBuffer1Length, 0);
