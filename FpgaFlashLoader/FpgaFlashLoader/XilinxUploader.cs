@@ -9,12 +9,12 @@ namespace FpgaFlashLoader
 {
     class XilinxUploader
     {
-        private SPI spi;
+        private AdvancedSpi spi;
         private byte[] statusBuffer;
         public static readonly int SramPageBufferSize = 264;
         private static readonly int MaxPageWriteRetries = 3;
 
-        public XilinxUploader(SPI spi)
+        public XilinxUploader(AdvancedSpi spi)
         {
             this.spi = spi;
             statusBuffer = new byte[2];

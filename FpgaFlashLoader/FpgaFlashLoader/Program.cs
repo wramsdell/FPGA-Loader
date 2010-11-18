@@ -70,17 +70,7 @@ namespace FpgaFlashLoader
         {
             OutputPort onboardLed = new OutputPort(Pins.ONBOARD_LED, true);
 
-            SPI.Configuration spiConfig = new SPI.Configuration(
-                Pins.GPIO_PIN_D0,
-                false,
-                100,
-                100,
-                false,
-                true,
-                1000,
-                SPI_Devices.SPI1
-            );
-            SPI spi = new SPI(spiConfig);
+            var spi = new AdvancedSpi(Pins.GPIO_PIN_D0, SPI_Devices.SPI1);
             var uploader = new XilinxUploader(spi);
 
             if (uploader.IsShieldInBootloaderMode())
