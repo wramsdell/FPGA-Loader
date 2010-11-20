@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Reflection;
+using System.Net;
 
 namespace Filesplit
 {
@@ -44,12 +45,18 @@ namespace Filesplit
         static readonly string FirstFilename = "Bitstream.bin.1";
         static readonly string HelpText = @"Use this program to prepare your FPGA bitstream for deployment with FpgaFlashLoader.
 
-1. Get a bitstream from somewhere, or create one using the Xilinx tools. This can be either a .bit file or a .bin file.
-2. Run this program on the file, with the filename in step 1 as an argument. For instance:
+1. Get a bitstream from somewhere, or create one using the Xilinx tools. This can be either a .bit file or a .bin file, and it can be a URL.
+2. Run this program on the file, with the filename / URL in step 1 as an argument. For instance:
 
 {0} mybitstream.bit
 
    (provided your bitstream is in 'mybitstream.bit')
+
+   or:
+
+{0} http://example.com/downloads/mybitstream.bit
+
+   (provided your bitstream is located at that URL)
 
 3. This will process the bitstream as required for the FpgaFlashLoader utility, and you should see the output:
 
@@ -105,7 +112,7 @@ namespace Filesplit
                 Exit(ExitStatus.NoSourceFilenameProvided);
             }
 
-            using (var inputStream = new FileStream(args[0], FileMode.Open))
+            using (var inputStream = GetFileOrUrlStream(args[0]))
             {
                 byte[] buffer = new byte[1024];
                 int currentFile = 1;
@@ -167,6 +174,31 @@ namespace Filesplit
 
             System.Console.WriteLine();
             System.Console.WriteLine("Your bitstream is ready. Use Visual Studio to rebuild and deploy your bitstream using the FpgaFlashLoader utility.");
+        }
+
+        private static Stream GetFileOrUrlStream(string filenameOrUrl)
+        {
+            // This function should accept the following formats:
+            //
+            // http://example.com/downloads/mybitstream.bit
+            // mybitstream.bin
+            // ..\..\mybitstream.bin
+            // C:\dir\mybitstream.bin
+
+            // If there is no colon, then it must be a file reference. Make it
+            // a full path (factor out any ".." and stuff) and let Uri do the
+            // rest.
+
+            // If it has a colon, it's either a) a drive reference before it,
+            // or b) a URL scheme before it. In both cases the Uri constructor
+            // will do the right thing.
+
+            if (!filenameOrUrl.Contains(':'))
+            {
+                filenameOrUrl = Path.GetFullPath(filenameOrUrl);
+            }
+
+            return WebRequest.Create(new Uri(filenameOrUrl)).GetResponse().GetResponseStream();
         }
 
         private static int ReadTwoByteInt(Stream inputStream)
