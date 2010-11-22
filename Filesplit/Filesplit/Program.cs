@@ -276,41 +276,49 @@ If you're SURE you know what you're doing, type 'yes'.";
             return (inputStream.ReadByte() << 8) | (inputStream.ReadByte());
         }
 
+        private static void StupidSkipBytes(Stream inputStream, int numberBytesToSkip)
+        {
+            for (int counter = 0; counter < numberBytesToSkip; ++counter)
+            {
+                inputStream.ReadByte();
+            }
+        }
+
         // http://www.fpga-faq.com/FAQ_Pages/0026_Tell_me_about_bit_files.htm
 
         private static void SkipBitHeaderInfo(Stream inputStream)
         {
             // Read two byte length, discard data
 
-            inputStream.Seek(ReadTwoByteInt(inputStream), SeekOrigin.Current);
+            StupidSkipBytes(inputStream, ReadTwoByteInt(inputStream));
 
             // Read two byte length, discard one byte expected data 'a'
 
-            inputStream.Seek(ReadTwoByteInt(inputStream), SeekOrigin.Current);
+            StupidSkipBytes(inputStream, ReadTwoByteInt(inputStream));
 
             // Read two byte length, discard data expected filename
 
-            inputStream.Seek(ReadTwoByteInt(inputStream), SeekOrigin.Current);
+            StupidSkipBytes(inputStream, ReadTwoByteInt(inputStream));
 
             // Read one byte expected field type 'b', read two byte length, discard part name
 
-            inputStream.Seek(1, SeekOrigin.Current);
-            inputStream.Seek(ReadTwoByteInt(inputStream), SeekOrigin.Current);
+            StupidSkipBytes(inputStream, 1);
+            StupidSkipBytes(inputStream, ReadTwoByteInt(inputStream));
 
             // Read one byte expected field type 'c', read two byte length, discard date
 
-            inputStream.Seek(1, SeekOrigin.Current);
-            inputStream.Seek(ReadTwoByteInt(inputStream), SeekOrigin.Current);
+            StupidSkipBytes(inputStream, 1);
+            StupidSkipBytes(inputStream, ReadTwoByteInt(inputStream));
 
             // Read one byte expected field type 'd', read two byte length, discard time
 
-            inputStream.Seek(1, SeekOrigin.Current);
-            inputStream.Seek(ReadTwoByteInt(inputStream), SeekOrigin.Current);
+            StupidSkipBytes(inputStream, 1);
+            StupidSkipBytes(inputStream, ReadTwoByteInt(inputStream));
 
             // Read one byte expected field type 'e', read four byte length, four byte length is data length
 
-            inputStream.Seek(1, SeekOrigin.Current);
-            inputStream.Seek(4, SeekOrigin.Current);
+            StupidSkipBytes(inputStream, 1);
+            StupidSkipBytes(inputStream, 4);
         }
     }
 }
