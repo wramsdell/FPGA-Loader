@@ -37,7 +37,8 @@ namespace Filesplit
         {
             None = 0,
             DestinationNotFound,
-            NoSourceFilenameProvided
+            NoSourceFilenameProvided,
+            BootloaderOptOut
         }
 
         static readonly int PageSize = 264;
@@ -72,6 +73,14 @@ namespace Filesplit
 
    Your bitstream is ready. Use Visual Studio to rebuild and deploy your bitstream using the FpgaFlashLoader utility.";
 
+        static readonly string DireBootloaderWarning = @"You have specified the --bootloader option. This will overwrite the bootloader.
+
+If you are uploading a user bitstream, this is NOT what you want!
+
+You should only use this option when provided with a new bootloader from Prototype Engineering.
+
+If you're SURE you know what you're doing, type 'yes'.";
+
         static void Exit(ExitStatus status)
         {
             Environment.Exit((int)status);
@@ -95,6 +104,8 @@ namespace Filesplit
         static void Main(string[] args)
         {
             string basePathname = RecursivelyFindFile(".", FirstFilename);
+            string inputFilename = "";
+            int currentAddress = UserStartAddress;
 
             if (basePathname == null)
             {
@@ -115,17 +126,29 @@ namespace Filesplit
                 Exit(ExitStatus.NoSourceFilenameProvided);
             }
 
-            using (var inputStream = GetFileOrUrlStream(args[0]))
+            foreach (var arg in args)
+            {
+                if (arg == "--bootloader")
+                {
+                    currentAddress = BootloaderStartAddress;
+                    GiveBootloaderAdminitionAndPotentiallyExit();
+                }
+                else
+                {
+                    inputFilename = arg;
+                }
+            }
+
+            using (var inputStream = GetFileOrUrlStream(inputFilename))
             {
                 byte[] buffer = new byte[PageSize + 4];
                 int currentFile = 1;
                 bool done = false;
                 string tempPathname = Path.GetTempFileName();
-                int currentAddress = UserStartAddress;
 
                 // If it's a .bit file, skip the header
 
-                if (Path.GetExtension(args[0]).ToLower() == ".bit")
+                if (Path.GetExtension(inputFilename).ToLower() == ".bit")
                 {
                     SkipBitHeaderInfo(inputStream);
                 }
@@ -185,6 +208,24 @@ namespace Filesplit
 
             System.Console.WriteLine();
             System.Console.WriteLine("Your bitstream is ready. Use Visual Studio to rebuild and deploy your bitstream using the FpgaFlashLoader utility.");
+        }
+
+        private static void GiveBootloaderAdminitionAndPotentiallyExit()
+        {
+            System.Console.Beep();
+            System.Console.BackgroundColor = ConsoleColor.Black;
+            System.Console.ForegroundColor = ConsoleColor.Red;
+            System.Console.WriteLine("*** WARNING ***");
+            System.Console.WriteLine();
+            System.Console.ResetColor();
+            System.Console.WriteLine(DireBootloaderWarning);
+
+            if (System.Console.ReadLine() != "yes")
+            {
+                Exit(ExitStatus.BootloaderOptOut);
+            }
+
+            System.Console.WriteLine();
         }
 
         private static int FullyRead(Stream inputStream, byte[] buffer, int offset, int count)
