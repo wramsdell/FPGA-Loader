@@ -9,12 +9,12 @@ namespace FpgaFlashLoader
 {
     class XilinxUploader
     {
-        private AdvancedSpi spi;
+        private SPI spi;
         private byte[] statusBuffer;
         public static readonly int SramPageBufferSize = 264;
         private static readonly int MaxPageWriteRetries = 3;
 
-        public XilinxUploader(AdvancedSpi spi)
+        public XilinxUploader(SPI spi)
         {
             this.spi = spi;
             statusBuffer = new byte[2];
@@ -89,20 +89,10 @@ namespace FpgaFlashLoader
             throw new XilinxUploaderException("Timeout waiting for ISF READY status");
         }
 
-        public void UploadBitstream(PageCollection pageCollection, int address)
+        public void UploadBitstream(PageCollection pageCollection)
         {
-            int currentAddress = address;
-
-            var commandBuffer = new byte[4];
-
             foreach (Page page in pageCollection)
             {
-                // Put in the current address
-
-                commandBuffer[1] = (byte)(currentAddress >> 16);
-                commandBuffer[2] = (byte)(currentAddress >> 8);
-                commandBuffer[3] = (byte)(currentAddress >> 0);
-
                 bool verifyFailed = false;
                 int verifyFailedCount = 0;
 
@@ -114,9 +104,9 @@ namespace FpgaFlashLoader
 
                     // Write it to the ISF
 
-                    commandBuffer[0] = (byte)SpiCommands.PageProgramThroughBuffer1;
+                    page.Data[page.Offset] = (byte)SpiCommands.PageProgramThroughBuffer1;
 
-                    spi.Write(commandBuffer, 0, commandBuffer.Length, page.Data, page.Offset, SramPageBufferSize);
+                    spi.WriteRead(page.Data, page.Offset, SramPageBufferSize + 4, null, 0, 0, 0);
 
                     // Wait until ready
 
@@ -124,9 +114,9 @@ namespace FpgaFlashLoader
 
                     // Verify it wrote
 
-                    commandBuffer[0] = (byte)SpiCommands.PageToBuffer1Compare;
+                    page.Data[page.Offset] = (byte)SpiCommands.PageToBuffer1Compare;
 
-                    spi.Write(commandBuffer);
+                    spi.WriteRead(page.Data, page.Offset, 4, null, 0, 0, 0);
 
                     // Wait until ready, and when it is, the compare result
                     // comes back in bit 6. Set is bad.
@@ -134,11 +124,11 @@ namespace FpgaFlashLoader
                     verifyFailed = ((WaitUntilReady() & StatusRegisterCompareMask) != 0);
                     if (verifyFailed)
                     {
-                        Debug.Print("Failed to write page address " + currentAddress);
+                        Debug.Print("Failed to write page");
                         ++verifyFailedCount;
                         if (verifyFailedCount == MaxPageWriteRetries)
                         {
-                            throw new XilinxUploaderException("Failed to write page address " + currentAddress);
+                            throw new XilinxUploaderException("Failed to write page");
                         }
                     }
                     else
@@ -146,10 +136,6 @@ namespace FpgaFlashLoader
                         // Page successfully uploaded
                     }
                 } while (verifyFailed);
-
-                // Adjust the current address by one page
-
-                currentAddress += 0x000200;
             }
         }
     }

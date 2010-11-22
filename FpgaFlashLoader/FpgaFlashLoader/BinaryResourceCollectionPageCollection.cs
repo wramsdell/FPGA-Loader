@@ -29,7 +29,7 @@ namespace FpgaFlashLoader
             while (currentPage.Data != null)
             {
                 yield return currentPage;
-                currentPage.Offset += XilinxUploader.SramPageBufferSize;
+                currentPage.Offset += (XilinxUploader.SramPageBufferSize + 4);
                 if (currentPage.Offset >= currentPage.Data.Length)
                 {
                     SetUpNextByteArray();

@@ -70,7 +70,17 @@ namespace FpgaFlashLoader
         {
             OutputPort onboardLed = new OutputPort(Pins.ONBOARD_LED, true);
 
-            var spi = new AdvancedSpi(Pins.GPIO_PIN_D0, SPI_Devices.SPI1);
+            SPI.Configuration spiConfig = new SPI.Configuration(
+                Pins.GPIO_PIN_D0,
+                false,
+                100,
+                100,
+                false,
+                true,
+                1000,
+                SPI_Devices.SPI1
+            );
+            var spi = new SPI(spiConfig);
             var uploader = new XilinxUploader(spi);
 
             if (uploader.IsShieldInBootloaderMode())
@@ -80,7 +90,7 @@ namespace FpgaFlashLoader
                 try
                 {
                     uploadStatusIndicator.Status = UploadStatusIndicator.UploadStatus.Uploading;
-                    uploader.UploadBitstream(new BinaryResourceCollectionPageCollection(GetResources()), 0x020000);
+                    uploader.UploadBitstream(new BinaryResourceCollectionPageCollection(GetResources()));
                     uploadStatusIndicator.Status = UploadStatusIndicator.UploadStatus.Succeeded;
                 }
                 catch

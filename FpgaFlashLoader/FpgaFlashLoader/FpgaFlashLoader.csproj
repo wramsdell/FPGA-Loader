@@ -30,7 +30,6 @@
   </PropertyGroup>
   <Import Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
   <ItemGroup>
-    <Compile Include="AdvancedSpi.cs" />
     <Compile Include="BinaryResourceCollectionPageCollection.cs" />
     <Compile Include="Page.cs" />
     <Compile Include="PageCollection.cs" />
