@@ -42,6 +42,9 @@ namespace Filesplit
 
         static readonly int PageSize = 264;
         static readonly byte PadByte = 0xFF;
+        static readonly int BootloaderStartAddress = 0x000000;
+        static readonly int UserStartAddress = 0x020000;
+        static readonly int PageIncrement = 0x000200;
         static readonly string FirstFilename = "Bitstream.bin.1";
         static readonly string HelpText = @"Use this program to prepare your FPGA bitstream for deployment with FpgaFlashLoader.
 
@@ -114,10 +117,11 @@ namespace Filesplit
 
             using (var inputStream = GetFileOrUrlStream(args[0]))
             {
-                byte[] buffer = new byte[1024];
+                byte[] buffer = new byte[PageSize + 4];
                 int currentFile = 1;
                 bool done = false;
                 string tempPathname = Path.GetTempFileName();
+                int currentAddress = UserStartAddress;
 
                 // If it's a .bit file, skip the header
 
@@ -134,25 +138,32 @@ namespace Filesplit
                     {
                         while (totalBytesCopied < partSize)
                         {
-                            int bytesRead = inputStream.Read(buffer, 0, Math.Min(buffer.Length, partSize - totalBytesCopied));
+                            int bytesRead = FullyRead(inputStream, buffer, 4, PageSize);
                             if (bytesRead == 0)
                             {
                                 // All copied
                                 done = true;
                                 break;
                             }
-                            outputStream.Write(buffer, 0, bytesRead);
-                            totalBytesCopied += bytesRead;
-                        }
-
-                        if ((done) && ((totalBytesCopied % PageSize) > 0))
-                        {
-                            // Pad out to a multiple of PageSize
-
-                            for (int counter = 0; counter < (PageSize - (totalBytesCopied % PageSize)); ++counter)
+                            else
                             {
-                                outputStream.WriteByte(PadByte);
+                                // Pad as required
+
+                                for (int counter = 0; counter < (PageSize - bytesRead); ++counter)
+                                {
+                                    buffer[counter + 4] = PadByte;
+                                }
                             }
+
+                            // Drop in the current address
+
+                            buffer[1] = (byte)(currentAddress >> 16);
+                            buffer[2] = (byte)(currentAddress >> 8);
+                            buffer[3] = (byte)(currentAddress >> 0);
+
+                            outputStream.Write(buffer, 0, buffer.Length);
+                            totalBytesCopied += buffer.Length;
+                            currentAddress += PageIncrement;
                         }
                     }
                     if (totalBytesCopied > 0)
@@ -174,6 +185,24 @@ namespace Filesplit
 
             System.Console.WriteLine();
             System.Console.WriteLine("Your bitstream is ready. Use Visual Studio to rebuild and deploy your bitstream using the FpgaFlashLoader utility.");
+        }
+
+        private static int FullyRead(Stream inputStream, byte[] buffer, int offset, int count)
+        {
+            int totalBytesRead;
+
+            totalBytesRead = 0;
+            while (totalBytesRead < count)
+            {
+                var bytesRead = inputStream.Read(buffer, offset + totalBytesRead, count - totalBytesRead);
+                if (bytesRead == 0)
+                {
+                    // End of stream, as much data as you're gonna get
+                    break;
+                }
+                totalBytesRead += bytesRead;
+            }
+            return totalBytesRead;
         }
 
         private static Stream GetFileOrUrlStream(string filenameOrUrl)
