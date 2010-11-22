@@ -150,7 +150,7 @@ If you're SURE you know what you're doing, type 'yes'.";
 
                 if (Path.GetExtension(inputFilename).ToLower() == ".bit")
                 {
-                    SkipBitHeaderInfo(inputStream);
+                    BitFileHeader.FromStream(inputStream);
                 }
 
                 do
@@ -269,56 +269,6 @@ If you're SURE you know what you're doing, type 'yes'.";
             }
 
             return WebRequest.Create(new Uri(filenameOrUrl)).GetResponse().GetResponseStream();
-        }
-
-        private static int ReadTwoByteInt(Stream inputStream)
-        {
-            return (inputStream.ReadByte() << 8) | (inputStream.ReadByte());
-        }
-
-        private static void StupidSkipBytes(Stream inputStream, int numberBytesToSkip)
-        {
-            for (int counter = 0; counter < numberBytesToSkip; ++counter)
-            {
-                inputStream.ReadByte();
-            }
-        }
-
-        // http://www.fpga-faq.com/FAQ_Pages/0026_Tell_me_about_bit_files.htm
-
-        private static void SkipBitHeaderInfo(Stream inputStream)
-        {
-            // Read two byte length, discard data
-
-            StupidSkipBytes(inputStream, ReadTwoByteInt(inputStream));
-
-            // Read two byte length, discard one byte expected data 'a'
-
-            StupidSkipBytes(inputStream, ReadTwoByteInt(inputStream));
-
-            // Read two byte length, discard data expected filename
-
-            StupidSkipBytes(inputStream, ReadTwoByteInt(inputStream));
-
-            // Read one byte expected field type 'b', read two byte length, discard part name
-
-            StupidSkipBytes(inputStream, 1);
-            StupidSkipBytes(inputStream, ReadTwoByteInt(inputStream));
-
-            // Read one byte expected field type 'c', read two byte length, discard date
-
-            StupidSkipBytes(inputStream, 1);
-            StupidSkipBytes(inputStream, ReadTwoByteInt(inputStream));
-
-            // Read one byte expected field type 'd', read two byte length, discard time
-
-            StupidSkipBytes(inputStream, 1);
-            StupidSkipBytes(inputStream, ReadTwoByteInt(inputStream));
-
-            // Read one byte expected field type 'e', read four byte length, four byte length is data length
-
-            StupidSkipBytes(inputStream, 1);
-            StupidSkipBytes(inputStream, 4);
         }
     }
 }
