@@ -174,7 +174,7 @@ If you're SURE you know what you're doing, type 'yes'.";
 
                                 for (int counter = 0; counter < (PageSize - bytesRead); ++counter)
                                 {
-                                    buffer[counter + 4] = PadByte;
+                                    buffer[counter + 4 + bytesRead] = PadByte;
                                 }
                             }
 
