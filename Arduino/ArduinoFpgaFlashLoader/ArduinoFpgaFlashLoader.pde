@@ -1,3 +1,5 @@
+// Copyright (C) Prototype Engineering, LLC. All rights reserved.
+
 #include <SPI.h>
 
 // Block data and functions
