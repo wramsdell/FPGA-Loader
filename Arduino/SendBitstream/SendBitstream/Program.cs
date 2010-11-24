@@ -1,4 +1,6 @@
-﻿using System.IO.Ports;
+﻿// Copyright (C) Prototype Engineering, LLC. All rights reserved.
+
+using System.IO.Ports;
 using System.Threading;
 
 namespace SendBitstream
