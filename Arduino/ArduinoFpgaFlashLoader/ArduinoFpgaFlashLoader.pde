@@ -62,6 +62,8 @@ static byte xilinx_get_status_register()
   SPI.transfer(xilinx_spi_command_status_register_read);
   return_value = SPI.transfer(0);
   digitalWrite(xilinx_spi_chip_select_pin, HIGH);
+
+  return return_value;
 }
 
 static bool xilinx_wait_until_ready()
