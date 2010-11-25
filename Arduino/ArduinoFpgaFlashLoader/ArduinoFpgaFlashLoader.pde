@@ -31,7 +31,7 @@ static void block_completed()
 
 static bool xilinx_have_queried_bootloader_mode = false;
 static bool xilinx_bootloader_mode = false;
-const int xilinx_spi_chip_select_pin = 7;
+const int xilinx_spi_chip_select_pin = 2;
 
 const byte xilinx_spi_command_page_to_buffer_1_compare = 0x60;
 const byte xilinx_spi_command_page_program_through_buffer_1 = 0x82;
