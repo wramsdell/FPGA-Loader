@@ -105,6 +105,7 @@ static bool xilinx_upload_page()
     return false;
   }
 
+  bool verify_failed = false;
   int verify_failed_count = 0;
 
   do
@@ -141,11 +142,12 @@ static bool xilinx_upload_page()
       return false;
     }
 
-    if ((xilinx_get_status_register() & xilinx_spi_status_register_compare_mask) != 0)
+    verify_failed = ((xilinx_get_status_register() & xilinx_spi_status_register_compare_mask) != 0);
+    if (verify_failed)
     {
       verify_failed_count++;
     }
-  } while (verify_failed_count < xilinx_max_verify_failed_count);
+  } while ((verify_failed) && (verify_failed_count < xilinx_max_verify_failed_count));
 
   return verify_failed_count < xilinx_max_verify_failed_count;
 }
