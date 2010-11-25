@@ -69,7 +69,7 @@ static byte xilinx_get_status_register()
 static bool xilinx_wait_until_ready()
 {
   byte status_register;
-  for (int counter = 0;counter < 100;++counter)
+  for (int counter = 0;counter < 1600;++counter)
   {
     status_register = xilinx_get_status_register();
     if ((status_register & xilinx_spi_status_register_ready_mask) != 0)
