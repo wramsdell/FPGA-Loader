@@ -18,6 +18,8 @@ namespace SendBitstream
 
         static void UploadPages(SerialPort arduinoPort, IEnumerable<Page> pages)
         {
+            int pageNumber = 0;
+            var statusTwiddle = @"|/-\";
             foreach (var page in pages)
             {
                 var response = TransmitBufferAndAwaitResponse(arduinoPort, page.Data, page.Offset, XilinxUtil.PageSize + 4);
@@ -25,8 +27,10 @@ namespace SendBitstream
                 {
                     throw new Exception(response.Substring(2));
                 }
-                System.Console.WriteLine("{0}", response);
+                System.Console.Write("\r{0} {1:D3} {2}", statusTwiddle[pageNumber % statusTwiddle.Length], pageNumber, response.Substring(2));
+                ++pageNumber;
             }
+            System.Console.WriteLine();
         }
 
         private static Stream GetFileOrUrlStream(string filenameOrUrl)

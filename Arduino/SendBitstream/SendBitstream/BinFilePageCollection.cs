@@ -51,7 +51,6 @@ namespace SendBitstream
                 }
 
                 XilinxUtil.Encode3ByteAddress(address, buffer, 1);
-                System.Console.WriteLine("Address {0:x6}", address);
                 address += XilinxUtil.PageIncrement;
 
                 // Pad as required
