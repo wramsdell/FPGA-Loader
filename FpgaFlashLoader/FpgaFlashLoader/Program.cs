@@ -63,9 +63,9 @@ namespace FpgaFlashLoader
         private static ShieldConfiguration CurrentShieldConfiguration = null;
 
         // SetupCurrentShieldConfiguration is a little fragile -- it uses
-        // SetupCurrentShieldConfiguration.SystemInfo.OEMString to try and
-        // figure out which configuration to use. If that string isn't
-        // handled, you will not survive.
+        // Microsoft.SPOT.Hardware.SystemInfo.OEMString to try and figure out
+        // which configuration to use. If that string isn't handled, you will
+        // not survive.
 
         private static void SetupCurrentShieldConfiguration()
         {
