@@ -2,13 +2,22 @@
 
 using System.Collections;
 using Microsoft.SPOT.Hardware;
-using SecretLabs.NETMF.Hardware.Netduino;
 using System.Threading;
 
 namespace FpgaFlashLoader
 {
     public class Program
     {
+        private static class NetduinoConstants
+        {
+            public const Cpu.Pin GPIO_PIN_D0 = (Cpu.Pin) 27;
+            public const Cpu.Pin GPIO_PIN_D1 = (Cpu.Pin) 28;
+            public const Cpu.Pin GPIO_PIN_D2 = (Cpu.Pin) 0;
+            public const Cpu.Pin GPIO_PIN_D3 = (Cpu.Pin) 1;
+            public const Cpu.Pin GPIO_PIN_D4 = (Cpu.Pin) 12;
+            public const Cpu.Pin ONBOARD_LED = (Cpu.Pin) 55;
+        }
+
         private class ShieldConfiguration
         {
             public Cpu.Pin RedLedPin { get; set;  }
@@ -19,16 +28,16 @@ namespace FpgaFlashLoader
         // Bootlader v1 configuration
         //private static ShieldConfiguration NetduinoShieldConfiguration = new ShieldConfiguration
         //{
-        //    RedLedPin = Pins.GPIO_PIN_D1,
-        //    GreenLedPin = Pins.GPIO_PIN_D2,
-        //    SpiChipSelectPin = Pins.GPIO_PIN_D0
+        //    RedLedPin = NetduinoConstants.GPIO_PIN_D1,
+        //    GreenLedPin = NetduinoConstants.GPIO_PIN_D2,
+        //    SpiChipSelectPin = NetduinoConstants.GPIO_PIN_D0
         //};
 
         private static ShieldConfiguration NetduinoShieldConfiguration = new ShieldConfiguration
         {
-            RedLedPin = Pins.GPIO_PIN_D3,
-            GreenLedPin = Pins.GPIO_PIN_D4,
-            SpiChipSelectPin = Pins.GPIO_PIN_D2
+            RedLedPin = NetduinoConstants.GPIO_PIN_D3,
+            GreenLedPin = NetduinoConstants.GPIO_PIN_D4,
+            SpiChipSelectPin = NetduinoConstants.GPIO_PIN_D2
         };
 
         public static IEnumerator GetResources()
@@ -90,7 +99,7 @@ namespace FpgaFlashLoader
 
         public static void Main()
         {
-            OutputPort onboardLed = new OutputPort(Pins.ONBOARD_LED, true);
+            OutputPort onboardLed = new OutputPort(NetduinoConstants.ONBOARD_LED, true);
 
             SPI.Configuration spiConfig = new SPI.Configuration(
                 NetduinoShieldConfiguration.SpiChipSelectPin,
@@ -100,7 +109,7 @@ namespace FpgaFlashLoader
                 false,
                 true,
                 1000,
-                SPI_Devices.SPI1
+                SPI.SPI_module.SPI1
             );
             var spi = new SPI(spiConfig);
             var uploader = new XilinxUploader(spi);
