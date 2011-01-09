@@ -60,7 +60,31 @@ namespace FpgaFlashLoader
             OnboardLedPin = FezConstants.LED
         };
 
-        private static ShieldConfiguration CurrentShieldConfiguration = FezShieldConfiguration;
+        private static ShieldConfiguration CurrentShieldConfiguration = null;
+
+        // SetupCurrentShieldConfiguration is a little fragile -- it uses
+        // SetupCurrentShieldConfiguration.SystemInfo.OEMString to try and
+        // figure out which configuration to use. If that string isn't
+        // handled, you will not survive.
+
+        private static void SetupCurrentShieldConfiguration()
+        {
+            var solutionVendorInfo = SystemInfo.OEMString;
+
+            switch (solutionVendorInfo)
+            {
+                case "GHI Electronics, LLC":
+                    CurrentShieldConfiguration = FezShieldConfiguration;
+                    break;
+
+                case "Netduino by Secret Labs LLC":
+                    CurrentShieldConfiguration = NetduinoShieldConfiguration;
+                    break;
+
+                default:
+                    break;
+            }
+        }
 
         public static IEnumerator GetResources()
         {
@@ -121,6 +145,8 @@ namespace FpgaFlashLoader
 
         public static void Main()
         {
+            SetupCurrentShieldConfiguration();
+
             OutputPort onboardLed = new OutputPort(CurrentShieldConfiguration.OnboardLedPin, true);
 
             SPI.Configuration spiConfig = new SPI.Configuration(
