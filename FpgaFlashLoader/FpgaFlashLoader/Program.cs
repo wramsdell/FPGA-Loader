@@ -69,9 +69,9 @@ namespace FpgaFlashLoader
 
         private static void SetupCurrentShieldConfiguration()
         {
-            var solutionVendorInfo = SystemInfo.OEMString;
+            var oemString = SystemInfo.OEMString;
 
-            switch (solutionVendorInfo)
+            switch (oemString)
             {
                 case "GHI Electronics, LLC":
                     CurrentShieldConfiguration = FezShieldConfiguration;
