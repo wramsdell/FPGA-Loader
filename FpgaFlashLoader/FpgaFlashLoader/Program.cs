@@ -9,6 +9,28 @@ namespace FpgaFlashLoader
 {
     public class Program
     {
+        private class ShieldConfiguration
+        {
+            public Cpu.Pin RedLedPin { get; set;  }
+            public Cpu.Pin GreenLedPin { get; set;  }
+            public Cpu.Pin SpiChipSelectPin { get; set;  }
+        }
+
+        // Bootlader v1 configuration
+        //private static ShieldConfiguration NetduinoShieldConfiguration = new ShieldConfiguration
+        //{
+        //    RedLedPin = Pins.GPIO_PIN_D1,
+        //    GreenLedPin = Pins.GPIO_PIN_D2,
+        //    SpiChipSelectPin = Pins.GPIO_PIN_D0
+        //};
+
+        private static ShieldConfiguration NetduinoShieldConfiguration = new ShieldConfiguration
+        {
+            RedLedPin = Pins.GPIO_PIN_D3,
+            GreenLedPin = Pins.GPIO_PIN_D4,
+            SpiChipSelectPin = Pins.GPIO_PIN_D2
+        };
+
         public static IEnumerator GetResources()
         {
             yield return Resources.BinaryResources.Bitstream_bin1;
@@ -58,10 +80,10 @@ namespace FpgaFlashLoader
                 }
             }
 
-            public UploadStatusIndicator()
+            public UploadStatusIndicator(Cpu.Pin redLedPin, Cpu.Pin greenLedPin)
             {
-                redFpgaLed = new OutputPort(Pins.GPIO_PIN_D1, false);
-                greenFpgaLed = new OutputPort(Pins.GPIO_PIN_D2, false);
+                redFpgaLed = new OutputPort(redLedPin, false);
+                greenFpgaLed = new OutputPort(greenLedPin, false);
                 Status = UploadStatus.None;
             }
         }
@@ -71,7 +93,7 @@ namespace FpgaFlashLoader
             OutputPort onboardLed = new OutputPort(Pins.ONBOARD_LED, true);
 
             SPI.Configuration spiConfig = new SPI.Configuration(
-                Pins.GPIO_PIN_D0,
+                NetduinoShieldConfiguration.SpiChipSelectPin,
                 false,
                 100,
                 100,
@@ -85,7 +107,7 @@ namespace FpgaFlashLoader
 
             if (uploader.IsShieldInBootloaderMode())
             {
-                var uploadStatusIndicator = new UploadStatusIndicator();
+                var uploadStatusIndicator = new UploadStatusIndicator(NetduinoShieldConfiguration.RedLedPin, NetduinoShieldConfiguration.GreenLedPin);
 
                 try
                 {
