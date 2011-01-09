@@ -18,27 +18,49 @@ namespace FpgaFlashLoader
             public const Cpu.Pin ONBOARD_LED = (Cpu.Pin) 55;
         }
 
+        private static class FezConstants
+        {
+            public const Cpu.Pin LED = (Cpu.Pin) 4;
+            public const Cpu.Pin Di4 = (Cpu.Pin) 19;
+            public const Cpu.Pin Di3 = (Cpu.Pin) 31;
+            public const Cpu.Pin Di2 = (Cpu.Pin) 33;
+        }
+
         private class ShieldConfiguration
         {
             public Cpu.Pin RedLedPin { get; set;  }
             public Cpu.Pin GreenLedPin { get; set;  }
             public Cpu.Pin SpiChipSelectPin { get; set;  }
+            public Cpu.Pin OnboardLedPin { get; set; }
         }
 
         // Bootlader v1 configuration
-        //private static ShieldConfiguration NetduinoShieldConfiguration = new ShieldConfiguration
-        //{
-        //    RedLedPin = NetduinoConstants.GPIO_PIN_D1,
-        //    GreenLedPin = NetduinoConstants.GPIO_PIN_D2,
-        //    SpiChipSelectPin = NetduinoConstants.GPIO_PIN_D0
-        //};
+        private static ShieldConfiguration OldNetduinoShieldConfiguration = new ShieldConfiguration
+        {
+            RedLedPin = NetduinoConstants.GPIO_PIN_D1,
+            GreenLedPin = NetduinoConstants.GPIO_PIN_D2,
+            SpiChipSelectPin = NetduinoConstants.GPIO_PIN_D0,
+            OnboardLedPin = NetduinoConstants.ONBOARD_LED
+        };
 
+        // Bootlader v2 configuration
         private static ShieldConfiguration NetduinoShieldConfiguration = new ShieldConfiguration
         {
             RedLedPin = NetduinoConstants.GPIO_PIN_D3,
             GreenLedPin = NetduinoConstants.GPIO_PIN_D4,
-            SpiChipSelectPin = NetduinoConstants.GPIO_PIN_D2
+            SpiChipSelectPin = NetduinoConstants.GPIO_PIN_D2,
+            OnboardLedPin = NetduinoConstants.ONBOARD_LED
         };
+
+        private static ShieldConfiguration FezShieldConfiguration = new ShieldConfiguration
+        {
+            RedLedPin = FezConstants.Di3,
+            GreenLedPin = FezConstants.Di4,
+            SpiChipSelectPin = FezConstants.Di2,
+            OnboardLedPin = FezConstants.LED
+        };
+
+        private static ShieldConfiguration CurrentShieldConfiguration = FezShieldConfiguration;
 
         public static IEnumerator GetResources()
         {
@@ -99,10 +121,10 @@ namespace FpgaFlashLoader
 
         public static void Main()
         {
-            OutputPort onboardLed = new OutputPort(NetduinoConstants.ONBOARD_LED, true);
+            OutputPort onboardLed = new OutputPort(CurrentShieldConfiguration.OnboardLedPin, true);
 
             SPI.Configuration spiConfig = new SPI.Configuration(
-                NetduinoShieldConfiguration.SpiChipSelectPin,
+                CurrentShieldConfiguration.SpiChipSelectPin,
                 false,
                 100,
                 100,
@@ -116,7 +138,7 @@ namespace FpgaFlashLoader
 
             if (uploader.IsShieldInBootloaderMode())
             {
-                var uploadStatusIndicator = new UploadStatusIndicator(NetduinoShieldConfiguration.RedLedPin, NetduinoShieldConfiguration.GreenLedPin);
+                var uploadStatusIndicator = new UploadStatusIndicator(CurrentShieldConfiguration.RedLedPin, CurrentShieldConfiguration.GreenLedPin);
 
                 try
                 {
