@@ -38,6 +38,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="ShieldConfiguration.cs" />
     <Compile Include="XilinxUploader.cs" />
   </ItemGroup>
   <ItemGroup>
