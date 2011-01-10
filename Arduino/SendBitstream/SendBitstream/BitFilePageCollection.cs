@@ -1,11 +1,12 @@
 ﻿// Copyright (C) Prototype Engineering, LLC. All rights reserved.
 
-using System.Collections.Generic;
+using System.Collections;
 using System.IO;
+using Prototype.Xilinx;
 
 namespace SendBitstream
 {
-    class BitFilePageCollection : IEnumerable<Page>
+    class BitFilePageCollection : PageCollection
     {
         private BinFilePageCollection delegateCollection;
 
@@ -15,16 +16,11 @@ namespace SendBitstream
             delegateCollection = new BinFilePageCollection(inputStream, address);
         }
 
-        public IEnumerator<Page> GetEnumerator()
+        public override IEnumerator GetEnumerator()
         {
             return delegateCollection.GetEnumerator();
         }
 
         public BitFileHeader Header { get; private set; }
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return delegateCollection.GetEnumerator();
-        }
     }
 }

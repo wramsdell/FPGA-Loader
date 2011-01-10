@@ -1,12 +1,13 @@
 ﻿// Copyright (C) Prototype Engineering, LLC. All rights reserved.
 
 using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.IO;
+using Prototype.Xilinx;
 
 namespace SendBitstream
 {
-    class BinFilePageCollection : IEnumerable<Page>
+    class BinFilePageCollection : PageCollection
     {
         private Stream inputStream;
         private Page page;
@@ -16,7 +17,7 @@ namespace SendBitstream
         public BinFilePageCollection(Stream inputStream, int address)
         {
             this.inputStream = inputStream;
-            this.buffer = new byte[XilinxUtil.PageSize + 4];
+            this.buffer = new byte[Constants.SramPageBufferSize + 4];
             this.page = new Page() { Data = buffer, Offset = 0 };
             this.address = address;
         }
@@ -39,34 +40,29 @@ namespace SendBitstream
             return totalBytesRead;
         }
 
-        public IEnumerator<Page> GetEnumerator()
+        public override IEnumerator GetEnumerator()
         {
             while (true)
             {
-                var bytesRead = FullyRead(inputStream, buffer, 4, XilinxUtil.PageSize);
+                var bytesRead = FullyRead(inputStream, buffer, 4, Constants.SramPageBufferSize);
 
                 if (bytesRead == 0)
                 {
                     break;
                 }
 
-                XilinxUtil.Encode3ByteAddress(address, buffer, 1);
-                address += XilinxUtil.PageIncrement;
+                Util.Encode3ByteAddress(address, buffer, 1);
+                address += Constants.PageIncrement;
 
                 // Pad as required
 
-                for (int counter = 0; counter < (XilinxUtil.PageSize - bytesRead); ++counter)
+                for (int counter = 0; counter < (Constants.SramPageBufferSize - bytesRead); ++counter)
                 {
-                    buffer[counter + 4 + bytesRead] = XilinxUtil.PadByte;
+                    buffer[counter + 4 + bytesRead] = Constants.PadByte;
                 }
 
                 yield return page;
             }
-        }
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -1,10 +1,11 @@
 ﻿// Copyright (C) Prototype Engineering, LLC. All rights reserved.
 
 using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.IO.Ports;
 using System.IO;
 using System.Net;
+using Prototype.Xilinx;
 
 namespace SendBitstream
 {
@@ -16,13 +17,13 @@ namespace SendBitstream
             return arduinoPort.ReadLine();
         }
 
-        static void UploadPages(SerialPort arduinoPort, IEnumerable<Page> pages)
+        static void UploadPages(SerialPort arduinoPort, IEnumerable pages)
         {
             int pageNumber = 0;
             var statusTwiddle = @"|/-\";
-            foreach (var page in pages)
+            foreach (Page page in pages)
             {
-                var response = TransmitBufferAndAwaitResponse(arduinoPort, page.Data, page.Offset, XilinxUtil.PageSize + 4);
+                var response = TransmitBufferAndAwaitResponse(arduinoPort, page.Data, page.Offset, Constants.SramPageBufferSize + 4);
                 if (response.StartsWith("- "))
                 {
                     throw new Exception(response.Substring(2));
@@ -71,9 +72,9 @@ namespace SendBitstream
 
             using (var inputStream = GetFileOrUrlStream(args[0]))
             {
-                IEnumerable<Page> pageEnumerable = IsBitFile(args[0]) ?
-                    (IEnumerable<Page>) new BitFilePageCollection(inputStream, XilinxUtil.UserStartAddress) :
-                    (IEnumerable<Page>) new BinFilePageCollection(inputStream, XilinxUtil.UserStartAddress);
+                IEnumerable pageEnumerable = IsBitFile(args[0]) ?
+                    (IEnumerable) new BitFilePageCollection(inputStream, Constants.UserStartAddress) :
+                    (IEnumerable) new BinFilePageCollection(inputStream, Constants.UserStartAddress);
                 UploadPages(arduinoPort, pageEnumerable);
             }
         }
