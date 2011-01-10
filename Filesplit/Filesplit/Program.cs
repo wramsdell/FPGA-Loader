@@ -1,12 +1,12 @@
 ﻿// Copyright (C) Prototype Engineering, LLC. All rights reserved.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Collections;
 using System.IO;
-using System.Reflection;
+using System.Linq;
 using System.Net;
+using System.Reflection;
+using Prototype.Xilinx;
 
 namespace Filesplit
 {
@@ -41,11 +41,6 @@ namespace Filesplit
             BootloaderOptOut
         }
 
-        static readonly int PageSize = 264;
-        static readonly byte PadByte = 0xFF;
-        static readonly int BootloaderStartAddress = 0x000000;
-        static readonly int UserStartAddress = 0x020000;
-        static readonly int PageIncrement = 0x000200;
         static readonly string FirstFilename = "Bitstream.bin.1";
         static readonly string HelpText = @"Use this program to prepare your FPGA bitstream for deployment with FpgaFlashLoader.
 
@@ -105,7 +100,7 @@ If you're SURE you know what you're doing, type 'yes'.";
         {
             string basePathname = RecursivelyFindFile(".", FirstFilename);
             string inputFilename = "";
-            int currentAddress = UserStartAddress;
+            int startAddress = Constants.UserStartAddress;
 
             if (basePathname == null)
             {
@@ -130,7 +125,7 @@ If you're SURE you know what you're doing, type 'yes'.";
             {
                 if (arg == "--bootloader")
                 {
-                    currentAddress = BootloaderStartAddress;
+                    startAddress = Constants.BootloaderStartAddress;
                     GiveBootloaderAdminitionAndPotentiallyExit();
                 }
                 else
@@ -141,17 +136,13 @@ If you're SURE you know what you're doing, type 'yes'.";
 
             using (var inputStream = GetFileOrUrlStream(inputFilename))
             {
-                byte[] buffer = new byte[PageSize + 4];
+                IEnumerator pageEnumerator = ((Path.GetExtension(inputFilename).ToLower() == ".bit") ?
+                    (IEnumerable)new BitFilePageCollection(inputStream, startAddress) :
+                    (IEnumerable)new BinFilePageCollection(inputStream, startAddress)).GetEnumerator();
+
                 int currentFile = 1;
                 bool done = false;
                 string tempPathname = Path.GetTempFileName();
-
-                // If it's a .bit file, skip the header
-
-                if (Path.GetExtension(inputFilename).ToLower() == ".bit")
-                {
-                    BitFileHeader.FromStream(inputStream);
-                }
 
                 do
                 {
@@ -161,32 +152,14 @@ If you're SURE you know what you're doing, type 'yes'.";
                     {
                         while (totalBytesCopied < partSize)
                         {
-                            int bytesRead = FullyRead(inputStream, buffer, 4, PageSize);
-                            if (bytesRead == 0)
+                            if (!pageEnumerator.MoveNext())
                             {
-                                // All copied
                                 done = true;
                                 break;
                             }
-                            else
-                            {
-                                // Pad as required
-
-                                for (int counter = 0; counter < (PageSize - bytesRead); ++counter)
-                                {
-                                    buffer[counter + 4 + bytesRead] = PadByte;
-                                }
-                            }
-
-                            // Drop in the current address
-
-                            buffer[1] = (byte)(currentAddress >> 16);
-                            buffer[2] = (byte)(currentAddress >> 8);
-                            buffer[3] = (byte)(currentAddress >> 0);
-
-                            outputStream.Write(buffer, 0, buffer.Length);
-                            totalBytesCopied += buffer.Length;
-                            currentAddress += PageIncrement;
+                            Page page = (Page)pageEnumerator.Current;
+                            outputStream.Write(page.Data, page.Offset, Constants.SramPageBufferSize + 4);
+                            totalBytesCopied += Constants.SramPageBufferSize + 4;
                         }
                     }
                     if (totalBytesCopied > 0)
@@ -226,24 +199,6 @@ If you're SURE you know what you're doing, type 'yes'.";
             }
 
             System.Console.WriteLine();
-        }
-
-        private static int FullyRead(Stream inputStream, byte[] buffer, int offset, int count)
-        {
-            int totalBytesRead;
-
-            totalBytesRead = 0;
-            while (totalBytesRead < count)
-            {
-                var bytesRead = inputStream.Read(buffer, offset + totalBytesRead, count - totalBytesRead);
-                if (bytesRead == 0)
-                {
-                    // End of stream, as much data as you're gonna get
-                    break;
-                }
-                totalBytesRead += bytesRead;
-            }
-            return totalBytesRead;
         }
 
         private static Stream GetFileOrUrlStream(string filenameOrUrl)
