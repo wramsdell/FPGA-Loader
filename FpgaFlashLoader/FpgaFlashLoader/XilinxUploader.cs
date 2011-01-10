@@ -3,7 +3,7 @@
 using System;
 using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
-using System.Collections;
+using Prototype.Xilinx;
 
 namespace FpgaFlashLoader
 {
@@ -11,22 +11,12 @@ namespace FpgaFlashLoader
     {
         private SPI spi;
         private byte[] statusBuffer;
-        public static readonly int SramPageBufferSize = 264;
         private static readonly int MaxPageWriteRetries = 3;
 
         public XilinxUploader(SPI spi)
         {
             this.spi = spi;
             statusBuffer = new byte[2];
-        }
-
-        // http://www.xilinx.com/support/documentation/user_guides/ug333.pdf
-
-        private enum SpiCommands : byte
-        {
-            PageToBuffer1Compare = 0x60,
-            PageProgramThroughBuffer1 = 0x82,
-            StatusRegisterRead = 0xD7,
         }
 
         public class XilinxUploaderException : Exception
@@ -47,7 +37,7 @@ namespace FpgaFlashLoader
 
         private byte GetStatusRegister()
         {
-            statusBuffer[0] = (byte)SpiCommands.StatusRegisterRead;
+            statusBuffer[0] = (byte)Constants.SpiCommands.StatusRegisterRead;
             spi.WriteRead(statusBuffer, statusBuffer);
             return statusBuffer[1];
         }
@@ -104,9 +94,9 @@ namespace FpgaFlashLoader
 
                     // Write it to the ISF
 
-                    page.Data[page.Offset] = (byte)SpiCommands.PageProgramThroughBuffer1;
+                    page.Data[page.Offset] = (byte)Constants.SpiCommands.PageProgramThroughBuffer1;
 
-                    spi.WriteRead(page.Data, page.Offset, SramPageBufferSize + 4, null, 0, 0, 0);
+                    spi.WriteRead(page.Data, page.Offset, Constants.SramPageBufferSize + 4, null, 0, 0, 0);
 
                     // Wait until ready
 
@@ -114,7 +104,7 @@ namespace FpgaFlashLoader
 
                     // Verify it wrote
 
-                    page.Data[page.Offset] = (byte)SpiCommands.PageToBuffer1Compare;
+                    page.Data[page.Offset] = (byte)Constants.SpiCommands.PageToBuffer1Compare;
 
                     spi.WriteRead(page.Data, page.Offset, 4, null, 0, 0, 0);
 

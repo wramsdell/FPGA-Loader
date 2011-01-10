@@ -1,8 +1,8 @@
 // Copyright (C) Prototype Engineering, LLC. All rights reserved.
 
-namespace FpgaFlashLoader
+namespace Prototype.Xilinx
 {
-    class Page
+    public class Page
     {
         public byte[] Data { get; set; }
         public int Offset { get; set; }

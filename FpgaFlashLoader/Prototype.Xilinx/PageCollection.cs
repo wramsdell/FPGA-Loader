@@ -2,9 +2,9 @@
 
 using System.Collections;
 
-namespace FpgaFlashLoader
+namespace Prototype.Xilinx
 {
-    abstract class PageCollection : IEnumerable
+    public abstract class PageCollection : IEnumerable
     {
         public abstract IEnumerator GetEnumerator();
     }

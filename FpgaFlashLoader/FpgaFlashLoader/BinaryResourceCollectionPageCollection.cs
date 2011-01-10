@@ -1,7 +1,7 @@
 // Copyright (C) Prototype Engineering, LLC. All rights reserved.
 
-using System;
 using System.Collections;
+using Prototype.Xilinx;
 
 namespace FpgaFlashLoader
 {
@@ -29,7 +29,7 @@ namespace FpgaFlashLoader
             while (currentPage.Data != null)
             {
                 yield return currentPage;
-                currentPage.Offset += (XilinxUploader.SramPageBufferSize + 4);
+                currentPage.Offset += (Constants.SramPageBufferSize + 4);
                 if (currentPage.Offset >= currentPage.Data.Length)
                 {
                     SetUpNextByteArray();
