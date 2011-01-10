@@ -4,9 +4,9 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace SendBitstream
+namespace Prototype.Xilinx
 {
-    class BitFileHeader
+    public class BitFileHeader
     {
         private static int ReadTwoByteInt(Stream inputStream)
         {
@@ -24,11 +24,11 @@ namespace SendBitstream
         private static string ReadTwoByteLengthAndAsciiZString(Stream inputStream)
         {
             int stringLength = ReadTwoByteInt(inputStream);
-            var builder = new StringBuilder(stringLength);
+            var builder = "";
 
             for (int counter = 0; counter < stringLength - 1; ++counter)
             {
-                builder.Append((char)inputStream.ReadByte());
+                builder += (char)inputStream.ReadByte();
             }
 
             // Ditch the zero at the end
@@ -42,7 +42,7 @@ namespace SendBitstream
         {
             if (inputStream.ReadByte() != expected)
             {
-                throw new IOException(String.Format("Incompatible data (expected {0:x})", expected));
+                throw new IOException("Incompatible data (expected " + expected + ")");
             }
         }
 
@@ -50,7 +50,7 @@ namespace SendBitstream
         {
             if ((ReadTwoByteInt(inputStream) != 1) || (inputStream.ReadByte() != expected))
             {
-                throw new IOException(String.Format("Incompatible data (expected {0:x})", expected));
+                throw new IOException("Incompatible data (expected " + expected + ")");
             }
         }
 

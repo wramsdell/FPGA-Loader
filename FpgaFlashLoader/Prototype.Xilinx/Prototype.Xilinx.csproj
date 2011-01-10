@@ -30,6 +30,9 @@
   </PropertyGroup>
   <Import Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
   <ItemGroup>
+    <Compile Include="BinFilePageCollection.cs" />
+    <Compile Include="BitFileHeader.cs" />
+    <Compile Include="BitFilePageCollection.cs" />
     <Compile Include="Page.cs" />
     <Compile Include="PageCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

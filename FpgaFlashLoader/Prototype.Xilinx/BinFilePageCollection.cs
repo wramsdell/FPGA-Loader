@@ -3,11 +3,10 @@
 using System;
 using System.Collections;
 using System.IO;
-using Prototype.Xilinx;
 
-namespace SendBitstream
+namespace Prototype.Xilinx
 {
-    class BinFilePageCollection : PageCollection
+    public class BinFilePageCollection : PageCollection
     {
         private Stream inputStream;
         private Page page;

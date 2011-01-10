@@ -2,11 +2,10 @@
 
 using System.Collections;
 using System.IO;
-using Prototype.Xilinx;
 
-namespace SendBitstream
+namespace Prototype.Xilinx
 {
-    class BitFilePageCollection : PageCollection
+    public class BitFilePageCollection : PageCollection
     {
         private BinFilePageCollection delegateCollection;
 
