@@ -37,24 +37,14 @@ namespace FpgaFlashLoader
 
         private byte GetStatusRegister()
         {
-            statusBuffer[0] = (byte)Constants.SpiCommands.StatusRegisterRead;
+            statusBuffer[0] = (byte)SpiCommands.StatusRegisterRead;
             spi.WriteRead(statusBuffer, statusBuffer);
             return statusBuffer[1];
         }
 
-        private static readonly byte StatusRegisterReadyMask = 0x80;
-        private static readonly byte StatusRegisterCompareMask = 0x40;
-        private static readonly byte StatusRegisterMemorySizeMask = 0x3C;
-
-        private enum IsfMemorySize : byte
-        {
-            Unknown = 0,
-            OneMegabit = 0x0C,
-        }
-
         private IsfMemorySize GetFpgaMemorySize()
         {
-            return (IsfMemorySize)(GetStatusRegister() & StatusRegisterMemorySizeMask);
+            return (IsfMemorySize)(GetStatusRegister() & Constants.StatusRegisterMemorySizeMask);
         }
 
         public bool IsShieldInBootloaderMode()
@@ -70,7 +60,7 @@ namespace FpgaFlashLoader
             for (int counter = 0; counter < 100; ++counter)
             {
                 var statusRegister = GetStatusRegister();
-                if ((statusRegister & StatusRegisterReadyMask) != 0)
+                if ((statusRegister & Constants.StatusRegisterReadyMask) != 0)
                 {
                     return statusRegister;
                 }
@@ -94,7 +84,7 @@ namespace FpgaFlashLoader
 
                     // Write it to the ISF
 
-                    page.Data[page.Offset] = (byte)Constants.SpiCommands.PageProgramThroughBuffer1;
+                    page.Data[page.Offset] = (byte)SpiCommands.PageProgramThroughBuffer1;
 
                     spi.WriteRead(page.Data, page.Offset, Constants.SramPageBufferSize + 4, null, 0, 0, 0);
 
@@ -104,14 +94,14 @@ namespace FpgaFlashLoader
 
                     // Verify it wrote
 
-                    page.Data[page.Offset] = (byte)Constants.SpiCommands.PageToBuffer1Compare;
+                    page.Data[page.Offset] = (byte)SpiCommands.PageToBuffer1Compare;
 
                     spi.WriteRead(page.Data, page.Offset, 4, null, 0, 0, 0);
 
                     // Wait until ready, and when it is, the compare result
                     // comes back in bit 6. Set is bad.
 
-                    verifyFailed = ((WaitUntilReady() & StatusRegisterCompareMask) != 0);
+                    verifyFailed = ((WaitUntilReady() & Constants.StatusRegisterCompareMask) != 0);
                     if (verifyFailed)
                     {
                         Debug.Print("Failed to write page");
