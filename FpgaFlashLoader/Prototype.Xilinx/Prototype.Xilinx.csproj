@@ -41,8 +41,4 @@
     <Compile Include="SpiCommands.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Microsoft.SPOT.Native">
-    </Reference>
-  </ItemGroup>
 </Project>
