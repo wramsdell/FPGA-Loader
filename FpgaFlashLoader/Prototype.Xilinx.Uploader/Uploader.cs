@@ -5,15 +5,15 @@ using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
 using Prototype.Xilinx;
 
-namespace FpgaFlashLoader
+namespace Prototype.Xilinx.Uploader
 {
-    class XilinxUploader
+    public class Uploader
     {
         private SPI spi;
         private byte[] statusBuffer;
         private static readonly int MaxPageWriteRetries = 3;
 
-        public XilinxUploader(SPI spi)
+        public Uploader(SPI spi)
         {
             this.spi = spi;
             statusBuffer = new byte[2];

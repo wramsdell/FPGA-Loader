@@ -2,9 +2,9 @@
 
 using Microsoft.SPOT.Hardware;
 
-namespace FpgaFlashLoader
+namespace Prototype.Xilinx.Uploader
 {
-    class UploadStatusIndicator
+    public class UploadStatusIndicator
     {
         private OutputPort redFpgaLed;
         private OutputPort greenFpgaLed;

@@ -2,9 +2,9 @@
 
 using Microsoft.SPOT.Hardware;
 
-namespace FpgaFlashLoader
+namespace Prototype.Xilinx.Uploader
 {
-    class ShieldConfiguration
+    public class ShieldConfiguration
     {
         public Cpu.Pin RedLedPin { get; set;  }
         public Cpu.Pin GreenLedPin { get; set;  }

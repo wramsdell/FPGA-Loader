@@ -3,6 +3,7 @@
 using System.Collections;
 using System.Threading;
 using Microsoft.SPOT.Hardware;
+using Prototype.Xilinx.Uploader;
 
 namespace FpgaFlashLoader
 {
@@ -33,7 +34,7 @@ namespace FpgaFlashLoader
                 SPI.SPI_module.SPI1
             );
             var spi = new SPI(spiConfig);
-            var uploader = new XilinxUploader(spi);
+            var uploader = new Uploader(spi);
 
             if (uploader.IsShieldInBootloaderMode())
             {
