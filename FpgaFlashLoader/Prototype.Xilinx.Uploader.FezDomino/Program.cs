@@ -25,12 +25,30 @@ namespace Prototype.Xilinx.Uploader.FezDomino
                     switch (extension.ToLower())
                     {
                         case ".bit":
-                            finalPageCollection = new BitFilePageCollection(new FileStream(filename, FileMode.Open), Constants.UserStartAddress);
+                            finalPageCollection = new BitFilePageCollection(
+                                new FixedBufferReadStream(
+                                    new FileStream(
+                                        filename,
+                                        FileMode.Open
+                                        ),
+                                    256
+                                    ),
+                                Constants.UserStartAddress
+                                );
                             Debug.Print(((BitFilePageCollection)finalPageCollection).Header.FileName);
                             break;
 
                         case ".bin":
-                            finalPageCollection = new BinFilePageCollection(new FileStream(filename, FileMode.Open), Constants.UserStartAddress);
+                            finalPageCollection = new BinFilePageCollection(
+                                new FixedBufferReadStream(
+                                    new FileStream(
+                                        filename,
+                                        FileMode.Open
+                                        ),
+                                    256
+                                    ),
+                                Constants.UserStartAddress
+                                );
                             break;
                     }
 
