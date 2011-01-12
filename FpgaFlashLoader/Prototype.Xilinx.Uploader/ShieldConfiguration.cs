@@ -83,6 +83,11 @@ namespace Prototype.Xilinx.Uploader
                         default:
                             break;
                     }
+
+                    if (oemString.IndexOf("Netduino Plus") > -1)
+                    {
+                        shieldConfiguration = NetduinoShieldConfiguration;
+                    }
                 }
 
                 return shieldConfiguration;
