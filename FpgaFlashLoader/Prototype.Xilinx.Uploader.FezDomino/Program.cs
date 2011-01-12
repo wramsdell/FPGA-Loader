@@ -21,6 +21,22 @@ namespace Prototype.Xilinx.Uploader.FezDomino
                 {
                     var extension = Path.GetExtension(filename);
                     var basename = Path.GetFileNameWithoutExtension(filename);
+                    int address = Constants.UserStartAddress;
+
+                    switch (basename.ToLower())
+                    {
+                        case "bootloader":
+                            address = Constants.BootloaderStartAddress;
+                            break;
+
+                        case "bootlader":
+                            address = Constants.BootloaderStartAddress;
+                            break;
+
+                        default:
+                            address = Constants.UserStartAddress;
+                            break;
+                    }
 
                     switch (extension.ToLower())
                     {
@@ -33,7 +49,7 @@ namespace Prototype.Xilinx.Uploader.FezDomino
                                         ),
                                     256
                                     ),
-                                Constants.UserStartAddress
+                                address
                                 );
                             Debug.Print(((BitFilePageCollection)finalPageCollection).Header.FileName);
                             break;
@@ -47,7 +63,7 @@ namespace Prototype.Xilinx.Uploader.FezDomino
                                         ),
                                     256
                                     ),
-                                Constants.UserStartAddress
+                                address
                                 );
                             break;
                     }
