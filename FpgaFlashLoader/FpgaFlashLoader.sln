@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prototype.Xilinx.Uploader",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prototype.Xilinx.Uploader.FezDomino", "Prototype.Xilinx.Uploader.FezDomino\Prototype.Xilinx.Uploader.FezDomino.csproj", "{60E8CAF4-0F5B-461A-A53D-6DF5BF2D5D54}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prototype.Xilinx.Uploader.NetduinoPlus", "Prototype.Xilinx.Uploader.NetduinoPlus\Prototype.Xilinx.Uploader.NetduinoPlus.csproj", "{419AB2CE-6C11-4D6D-BA9F-AACDBD91CF94}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,12 @@ Global
 		{60E8CAF4-0F5B-461A-A53D-6DF5BF2D5D54}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{60E8CAF4-0F5B-461A-A53D-6DF5BF2D5D54}.Release|Any CPU.Build.0 = Release|Any CPU
 		{60E8CAF4-0F5B-461A-A53D-6DF5BF2D5D54}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{419AB2CE-6C11-4D6D-BA9F-AACDBD91CF94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{419AB2CE-6C11-4D6D-BA9F-AACDBD91CF94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{419AB2CE-6C11-4D6D-BA9F-AACDBD91CF94}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{419AB2CE-6C11-4D6D-BA9F-AACDBD91CF94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{419AB2CE-6C11-4D6D-BA9F-AACDBD91CF94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{419AB2CE-6C11-4D6D-BA9F-AACDBD91CF94}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
