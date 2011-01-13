@@ -1,5 +1,6 @@
 // Copyright (C) Prototype Engineering, LLC. All rights reserved.
 
+using System.Collections;
 using Microsoft.SPOT.Hardware;
 
 namespace Prototype.Xilinx.Uploader
@@ -55,6 +56,19 @@ namespace Prototype.Xilinx.Uploader
             OnboardLedPin = FezConstants.LED
         };
 
+        private class ShieldTableEntry
+        {
+            public string Name { get; set; }
+            public ShieldConfiguration Configuration { get; set; }
+        }
+
+        private static ArrayList shieldList = new ArrayList()
+        {
+            new ShieldTableEntry { Name = "GHI Electronics, LLC",           Configuration = FezShieldConfiguration },
+            new ShieldTableEntry { Name = "Netduino by Secret Labs LLC",    Configuration = NetduinoShieldConfiguration },
+            new ShieldTableEntry { Name = "Netduino Plus",                  Configuration = NetduinoShieldConfiguration },
+        };
+
         private static ShieldConfiguration shieldConfiguration;
 
         // SetupCurrentShieldConfiguration is a little fragile -- it uses
@@ -70,23 +84,12 @@ namespace Prototype.Xilinx.Uploader
                 {
                     var oemString = SystemInfo.OEMString;
 
-                    switch (oemString)
+                    foreach (ShieldTableEntry entry in shieldList)
                     {
-                        case "GHI Electronics, LLC":
-                            shieldConfiguration = FezShieldConfiguration;
-                            break;
-
-                        case "Netduino by Secret Labs LLC":
-                            shieldConfiguration = NetduinoShieldConfiguration;
-                            break;
-
-                        default:
-                            break;
-                    }
-
-                    if (oemString.IndexOf("Netduino Plus") > -1)
-                    {
-                        shieldConfiguration = NetduinoShieldConfiguration;
+                        if (oemString.IndexOf(entry.Name) > -1)
+                        {
+                            shieldConfiguration = entry.Configuration;
+                        }
                     }
                 }
 
