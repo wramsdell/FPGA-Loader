@@ -81,3 +81,8 @@ byte* Block::get_data()
   return _data;
 }
 
+byte Block::get_command()
+{
+  return _command;
+}
+

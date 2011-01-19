@@ -13,6 +13,7 @@ class Block
     bool read_data();
     void completed();
     byte* get_data();
+    byte get_command();
 
   private:
     size_t _bytes_read;
