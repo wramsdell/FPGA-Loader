@@ -13,6 +13,11 @@ namespace SendBitstream
     {
         static string TransmitBufferAndAwaitResponse(SerialPort arduinoPort, byte[] buffer, int offset, int count)
         {
+            byte[] header = new byte[3];
+            header[0] = 0x01;
+            header[1] = (byte) (count >> 8);
+            header[2] = (byte) (count & 0x0FF);
+            arduinoPort.Write(header, 0, 3);
             arduinoPort.Write(buffer, offset, count);
             return arduinoPort.ReadLine();
         }
