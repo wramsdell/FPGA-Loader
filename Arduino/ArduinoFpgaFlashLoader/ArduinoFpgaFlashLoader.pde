@@ -2,23 +2,27 @@
 
 #include <SPI.h>
 
+#include "Block.h"
+#include "Xilinx.h"
+
+Block block;
+Xilinx xilinx;
+
 void setup()
 {
   Serial.begin(115200);
-
-  xilinx_init();
 }
 
 void loop()
 {
   if (Serial.available() > 0)
   {
-    if (block_read_data())
+    if (block.read_data())
     {
       // Block is completed
-      if (xilinx_is_in_bootloader_mode())
+      if (xilinx.is_in_bootloader_mode())
       {
-        if (xilinx_upload_page())
+        if (xilinx.upload_page(block.get_data()))
         {
           status_report_success("Page uploaded");
         }
@@ -31,7 +35,7 @@ void loop()
       {
         status_report_failure("Shield not in bootloader mode");
       }
-      block_completed();
+      block.completed();
     }
   }
 }
