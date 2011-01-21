@@ -5,3 +5,6 @@
 OnBoardFlash.dat
 *.userprefs
 *.pidb
+*.testsettings
+*.vsmdi
+TestResults
