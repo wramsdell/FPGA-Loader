@@ -2,6 +2,7 @@
 
 using System;
 using System.Linq;
+using System.Text;
 
 namespace SendBitstream
 {
@@ -29,6 +30,22 @@ namespace SendBitstream
                     propertyAndAttribute.Property.SetValue(target, finalValue, null);
                 }
             }
+        }
+
+        public static string GetDescriptionText(object target)
+        {
+            var builder = new StringBuilder();
+            var helpLines = (from p in target.GetType().GetProperties()
+                             from a in p.GetCustomAttributes(typeof(ArgumentAttribute), true)
+                             select "/" + ((ArgumentAttribute) a).Name + " " + ((ArgumentAttribute) a).Description);
+
+            foreach (var line in helpLines)
+            {
+                builder.Append(line);
+                builder.Append(Environment.NewLine);
+            }
+
+            return builder.ToString();
         }
     }
 }
