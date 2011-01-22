@@ -18,21 +18,29 @@ namespace SendBitstream
                 if (args[counter].StartsWith("/"))
                 {
                     var argumentName = args[counter].Substring(1);
-                    var argumentValue = args[counter + 1];
-                    object finalValue = argumentValue;
+                    object argumentValue;
 
                     var property = (from p in target.GetType().GetProperties()
                                     from a in p.GetCustomAttributes(typeof(ArgumentAttribute), true)
                                     where (((ArgumentAttribute)a).Name == argumentName)
                                     select p).First();
 
-                    if (property.PropertyType != typeof(string))
+                    if (property.PropertyType == typeof(bool))
                     {
-                        finalValue = property.PropertyType.GetMethod("Parse", new Type[] { typeof(string) }).Invoke(null, new object[] { argumentValue });
+                        argumentValue = true;
                     }
-                    property.SetValue(target, finalValue, null);
+                    else
+                    {
+                        argumentValue = args[counter + 1];
 
-                    ++counter;
+                        ++counter;
+
+                        if (property.PropertyType != typeof(string))
+                        {
+                            argumentValue = property.PropertyType.GetMethod("Parse", new Type[] { typeof(string) }).Invoke(null, new object[] { argumentValue });
+                        }
+                    }
+                    property.SetValue(target, argumentValue, null);
                 }
                 else
                 {
