@@ -43,6 +43,9 @@ namespace SendBitstream
 
         private class ProgramArguments
         {
+            [Argument("help", "Print out help")]
+            public bool PrintHelp { get; private set; }
+
             [Argument("port", "Select the COM port to use")]
             public string Port { get; private set; }
 
@@ -62,6 +65,12 @@ namespace SendBitstream
             var arguments = new ProgramArguments();
 
             args = Arguments.Parse(args, arguments);
+
+            if (arguments.PrintHelp)
+            {
+                System.Console.Write(Arguments.GetDescriptionText(arguments));
+                Environment.Exit(1);
+            }
 
             SerialPort arduinoPort = new SerialPort(arguments.Port, arguments.Speed);
             arduinoPort.Open();
