@@ -61,7 +61,6 @@ namespace SendBitstream
 
         static void Main(string[] args)
         {
-            System.Console.WriteLine("Woo");
             var arguments = new ProgramArguments();
 
             args = Arguments.Parse(args, arguments);
