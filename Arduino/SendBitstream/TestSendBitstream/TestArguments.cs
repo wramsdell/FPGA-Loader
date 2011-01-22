@@ -101,21 +101,5 @@ namespace TestSendBitstream
 
             AssertArraysAreEqual(new string[] { "bootloader.bit" }, remainingArgs);
         }
-
-        //class OneIntArgumentWithDefault
-        //{
-        //    [Argument("a", "description", Default=115200)]
-        //    public int Value { get; private set; }
-        //}
-
-        //[TestMethod]
-        //public void TestOneIntArgumentWithDefault()
-        //{
-        //    var args = new OneIntArgument();
-
-        //    Arguments.Parse(new string[] { }, args);
-
-        //    Assert.AreEqual(115200, args.Value);
-        //}
     }
 }
