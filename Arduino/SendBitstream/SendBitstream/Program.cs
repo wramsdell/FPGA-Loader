@@ -101,9 +101,28 @@ namespace SendBitstream
             return (Path.GetExtension(filename).ToLower() == ".bit");
         }
 
+        private class ProgramArguments
+        {
+            [Argument("port", "Select the COM port to use")]
+            public string Port { get; private set; }
+
+            [Argument("speed", "Select the COM port baud rate")]
+            public int Speed { get; private set; }
+
+            public ProgramArguments()
+            {
+                Port = "COM3";
+                Speed = 115200;
+            }
+        }
+
         static void Main(string[] args)
         {
-            SerialPort arduinoPort = new SerialPort("COM3", 115200);
+            var arguments = new ProgramArguments();
+
+            args = Arguments.Parse(args, arguments);
+
+            SerialPort arduinoPort = new SerialPort(arguments.Port, arguments.Speed);
             arduinoPort.Open();
             arduinoPort.NewLine = "\r\n";   // Consistent with the Arduino Serial.println method which transmits \r\n
 
