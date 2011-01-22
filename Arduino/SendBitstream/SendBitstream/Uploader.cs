@@ -25,6 +25,26 @@ namespace SendBitstream
             FpgaBothLeds = FpgaGreenLed | FpgaRedLed
         }
 
+        public class UploaderException : Exception
+        {
+            public UploaderException()
+                : base()
+            {
+            }
+            public UploaderException(string message)
+                : base(message)
+            {
+            }
+            public UploaderException(string message, Exception inner)
+                : base(message, inner)
+            {
+            }
+            public UploaderException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+                : base(info, context)
+            {
+            }
+        }
+
         private static string TransmitBufferAndAwaitResponse(SerialPort arduinoPort, Commands command, byte[] buffer, int offset, int count)
         {
             byte[] header = new byte[3];
@@ -36,7 +56,7 @@ namespace SendBitstream
             var response = arduinoPort.ReadLine();
             if (response.StartsWith("- "))
             {
-                throw new Exception(response.Substring(2));
+                throw new UploaderException(response.Substring(2));
             }
             return response;
         }
