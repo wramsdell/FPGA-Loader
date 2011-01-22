@@ -3,13 +3,16 @@
 using System;
 using System.Linq;
 using System.Text;
+using System.Collections.Generic;
 
 namespace SendBitstream
 {
     public class Arguments
     {
-        public static void Parse(string[] args, object target)
+        public static string[] Parse(string[] args, object target)
         {
+            var returnStrings = new List<string>();
+
             for (int counter = 0; counter < args.Length; ++counter)
             {
                 if (args[counter].StartsWith("/"))
@@ -25,11 +28,19 @@ namespace SendBitstream
 
                     if (property.PropertyType != typeof(string))
                     {
-                        finalValue = property.PropertyType.GetMethod("Parse", new Type[] { typeof(string) } ).Invoke(null, new object[] { argumentValue });
+                        finalValue = property.PropertyType.GetMethod("Parse", new Type[] { typeof(string) }).Invoke(null, new object[] { argumentValue });
                     }
                     property.SetValue(target, finalValue, null);
+
+                    ++counter;
+                }
+                else
+                {
+                    returnStrings.Add(args[counter]);
                 }
             }
+
+            return returnStrings.ToArray();
         }
 
         public static string GetDescriptionText(object target)

@@ -2,6 +2,7 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SendBitstream;
+using System;
 
 namespace TestSendBitstream
 {
@@ -70,6 +71,35 @@ namespace TestSendBitstream
             Assert.AreEqual(@"/port Select the COM port to use
 /speed Select the COM port baud rate
 ", descriptionText);
+        }
+
+        private static void AssertArraysAreEqual<T>(T[] expected, T[] actual)
+        {
+            if (expected.Length != actual.Length)
+            {
+                throw new AssertFailedException(String.Format("Expected length {0:d}, actual length {1:d}", expected.Length, actual.Length));
+            }
+
+            for (int counter = 0; counter < expected.Length;++counter)
+            {
+                if (!expected[counter].Equals(actual[counter]))
+                {
+                    throw new AssertFailedException(String.Format("Expected <{0:s}>, actual <{1:s}> at element {2:d}", expected[counter], actual[counter], counter));
+                }
+            }
+        }
+
+        [TestMethod]
+        public void TestArgumentsWithStuffLeftAfterArguments()
+        {
+            var args = new TwoArguments();
+
+            var remainingArgs = Arguments.Parse(new string[] { "/port", "COM3", "/speed", "115200", "bootloader.bit" }, args);
+
+            Assert.AreEqual("COM3", args.Port);
+            Assert.AreEqual(115200, args.Speed);
+
+            AssertArraysAreEqual(new string[] { "bootloader.bit" }, remainingArgs);
         }
 
         //class OneIntArgumentWithDefault
