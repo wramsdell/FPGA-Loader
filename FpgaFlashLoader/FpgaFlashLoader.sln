@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prototype.Xilinx.Uploader.F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prototype.Xilinx.Uploader.NetduinoPlus", "Prototype.Xilinx.Uploader.NetduinoPlus\Prototype.Xilinx.Uploader.NetduinoPlus.csproj", "{419AB2CE-6C11-4D6D-BA9F-AACDBD91CF94}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prototype.Xilinx.Uploader.SpiTester", "Prototype.Xilinx.Uploader.SpiTester\Prototype.Xilinx.Uploader.SpiTester.csproj", "{CCB12A0D-0DAF-4BE2-878A-B320E9625C52}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,12 @@ Global
 		{419AB2CE-6C11-4D6D-BA9F-AACDBD91CF94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{419AB2CE-6C11-4D6D-BA9F-AACDBD91CF94}.Release|Any CPU.Build.0 = Release|Any CPU
 		{419AB2CE-6C11-4D6D-BA9F-AACDBD91CF94}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{CCB12A0D-0DAF-4BE2-878A-B320E9625C52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCB12A0D-0DAF-4BE2-878A-B320E9625C52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCB12A0D-0DAF-4BE2-878A-B320E9625C52}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{CCB12A0D-0DAF-4BE2-878A-B320E9625C52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCB12A0D-0DAF-4BE2-878A-B320E9625C52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCB12A0D-0DAF-4BE2-878A-B320E9625C52}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
