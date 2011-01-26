@@ -12,6 +12,24 @@ namespace Prototype.Xilinx.Uploader
         public Cpu.Pin SpiChipSelectPin { get; set;  }
         public Cpu.Pin OnboardLedPin { get; set; }
 
+        public class ShieldConfigurationException : System.Exception
+        {
+            public ShieldConfigurationException()
+                : base()
+            {
+            }
+
+            public ShieldConfigurationException(string message)
+                : base(message)
+            {
+            }
+
+            public ShieldConfigurationException(string message, System.Exception innerException)
+                : base(message, innerException)
+            {
+            }
+        }
+
         private static class NetduinoConstants
         {
             public const Cpu.Pin GPIO_PIN_D0 = (Cpu.Pin) 27;
@@ -64,9 +82,8 @@ namespace Prototype.Xilinx.Uploader
 
         private static ArrayList shieldList = new ArrayList()
         {
-            new ShieldTableEntry { Name = "GHI Electronics, LLC",           Configuration = FezShieldConfiguration },
-            new ShieldTableEntry { Name = "Netduino by Secret Labs LLC",    Configuration = NetduinoShieldConfiguration },
-            new ShieldTableEntry { Name = "Netduino Plus",                  Configuration = NetduinoShieldConfiguration },
+            new ShieldTableEntry { Name = "GHI Electronics, LLC",   Configuration = FezShieldConfiguration },
+            new ShieldTableEntry { Name = "Netduino",               Configuration = NetduinoShieldConfiguration },
         };
 
         private static ShieldConfiguration shieldConfiguration;
@@ -90,6 +107,11 @@ namespace Prototype.Xilinx.Uploader
                         {
                             shieldConfiguration = entry.Configuration;
                         }
+                    }
+
+                    if (shieldConfiguration == null)
+                    {
+                        throw new ShieldConfigurationException("Unable to identify board \"" + oemString + "\"");
                     }
                 }
 
