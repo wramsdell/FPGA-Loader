@@ -11,6 +11,7 @@ Xilinx xilinx;
 const byte COMMAND_UPLOAD_PAGE = 0x01;
 const byte COMMAND_SET_LEDS    = 0x02;
 const byte COMMAND_READ_SECURITY_REGISTER = 0x03;
+const byte COMMAND_PROGRAM_SECURITY_REGISTER = 0x04;
 
 const byte GREEN_LED_MASK = 0b00000001;
 const byte RED_LED_MASK   = 0b00000010;
@@ -73,6 +74,17 @@ void loop()
             else
             {
               status_report_failure("Failed to read security register");
+            }
+            break;
+
+          case COMMAND_PROGRAM_SECURITY_REGISTER:
+            if (xilinx.security_register_program(block.get_data()))
+            {
+              status_report_success("Program security register sent");
+            }
+            else
+            {
+              status_report_failure("Program security register failed");
             }
             break;
 

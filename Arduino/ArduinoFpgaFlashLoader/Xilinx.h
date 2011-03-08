@@ -5,7 +5,8 @@
 
 #include "WProgram.h"
 
-const size_t security_register_length = 128;
+const size_t security_register_user_field_length = 64;
+const size_t security_register_length = security_register_user_field_length + 64;
 
 class Xilinx
 {
@@ -14,6 +15,7 @@ class Xilinx
     bool is_in_bootloader_mode();
     bool upload_page(byte* page_data);
     byte* security_register_read();
+    bool security_register_program(const byte* user_field_data);
 
   private:
     byte get_status_register();
