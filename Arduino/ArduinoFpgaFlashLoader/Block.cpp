@@ -40,7 +40,7 @@ bool Block::read_data()
 
       case STATE_WAITING_FOR_LENGTH_BYTE_2:
         _length = (_length << 8) | Serial.read();
-        _state = STATE_WAITING_FOR_MORE_DATA;
+        _state = (_length > 0) ? STATE_WAITING_FOR_MORE_DATA : STATE_BLOCK_RECEIVED;
         break;
 
       case STATE_WAITING_FOR_MORE_DATA:
