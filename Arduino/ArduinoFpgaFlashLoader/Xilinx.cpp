@@ -9,6 +9,7 @@
 const int xilinx_spi_chip_select_pin = 2;
 
 const byte xilinx_spi_command_page_to_buffer_1_compare = 0x60;
+const byte xilinx_spi_command_security_register_read = 0x77;
 const byte xilinx_spi_command_page_program_through_buffer_1 = 0x82;
 const byte xilinx_spi_command_status_register_read = 0xD7;
 
@@ -128,5 +129,25 @@ bool Xilinx::upload_page(byte* page_data)
   } while ((verify_failed) && (verify_failed_count < xilinx_max_verify_failed_count));
 
   return verify_failed_count < xilinx_max_verify_failed_count;
+}
+
+byte* Xilinx::security_register_read()
+{
+  if (!wait_until_ready())
+  {
+    return NULL;
+  }
+
+  digitalWrite(xilinx_spi_chip_select_pin, LOW);
+  SPI.transfer(xilinx_spi_command_security_register_read);
+  SPI.transfer(0);
+  SPI.transfer(0);
+  SPI.transfer(0);
+  for (size_t counter = 0;counter < security_register_length;++counter)
+  {
+    _security_register_contents[counter] = SPI.transfer(0);
+  }
+  digitalWrite(xilinx_spi_chip_select_pin, HIGH);
+  return _security_register_contents;
 }
 

@@ -10,6 +10,7 @@ Xilinx xilinx;
 
 const byte COMMAND_UPLOAD_PAGE = 0x01;
 const byte COMMAND_SET_LEDS    = 0x02;
+const byte COMMAND_READ_SECURITY_REGISTER = 0x03;
 
 const byte GREEN_LED_MASK = 0b00000001;
 const byte RED_LED_MASK   = 0b00000010;
@@ -26,6 +27,8 @@ void setup()
 
 void loop()
 {
+  byte* security_register_contents;
+
   if (Serial.available() > 0)
   {
     if (block.read_data())
@@ -59,6 +62,18 @@ void loop()
             digitalWrite(fpga_red_led_pin, ((block.get_data()[0] & RED_LED_MASK) != 0) ? HIGH : LOW);
 
             status_report_success("LED state changed");
+            break;
+
+          case COMMAND_READ_SECURITY_REGISTER:
+            security_register_contents = xilinx.security_register_read();
+            if (security_register_contents)
+            {
+              status_report_success_binary(security_register_contents, security_register_length);
+            }
+            else
+            {
+              status_report_failure("Failed to read security register");
+            }
             break;
 
           default:
