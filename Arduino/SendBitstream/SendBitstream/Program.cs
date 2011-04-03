@@ -2,10 +2,10 @@
 
 using System;
 using System.Collections;
-using System.IO.Ports;
 using System.IO;
 using System.Net;
 using Prototype.Xilinx;
+using Prototype.Xilinx.Uploader.Arduino;
 
 namespace SendBitstream
 {
@@ -71,16 +71,14 @@ namespace SendBitstream
                 Environment.Exit(1);
             }
 
-            SerialPort arduinoPort = new SerialPort(arguments.Port, arguments.Speed);
-            arduinoPort.Open();
-            arduinoPort.NewLine = "\r\n";   // Consistent with the Arduino Serial.println method which transmits \r\n
+            ArduinoConnection arduinoConnection = new ArduinoConnection(arguments.Port, arguments.Speed);
 
             using (var inputStream = GetFileOrUrlStream(args[0]))
             {
                 IEnumerable pageEnumerable = IsBitFile(args[0]) ?
                     (IEnumerable) new BitFilePageCollection(inputStream, Constants.UserStartAddress) :
                     (IEnumerable) new BinFilePageCollection(inputStream, Constants.UserStartAddress);
-                Uploader.UploadPages(arduinoPort, pageEnumerable);
+                arduinoConnection.UploadPages(pageEnumerable);
             }
         }
     }

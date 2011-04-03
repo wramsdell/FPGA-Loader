@@ -2,20 +2,19 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{537D5041-7218-4686-AA55-E0B5F09B317C}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{5F15A416-5FEA-4A35-9506-C87FDA585014}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SendBitstream</RootNamespace>
-    <AssemblyName>SendBitstream</AssemblyName>
+    <RootNamespace>Prototype.Xilinx.Uploader.Arduino</RootNamespace>
+    <AssemblyName>Prototype.Xilinx.Uploader.Arduino</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,8 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -43,17 +41,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArgumentAttribute.cs" />
-    <Compile Include="Arguments.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="ArduinoConnection.cs" />
+    <Compile Include="ArduinoConnectionException.cs" />
+    <Compile Include="Commands.cs" />
+    <Compile Include="Leds.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\FpgaFlashLoader\Prototype.Xilinx.Uploader.Arduino\Prototype.Xilinx.Uploader.Arduino.csproj">
-      <Project>{5F15A416-5FEA-4A35-9506-C87FDA585014}</Project>
-      <Name>Prototype.Xilinx.Uploader.Arduino</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\FpgaFlashLoader\Prototype.Xilinx\Prototype.Xilinx.csproj">
+    <ProjectReference Include="..\Prototype.Xilinx\Prototype.Xilinx.csproj">
       <Project>{AC671E13-9EDE-4A57-AE19-61FDE4F9FCA0}</Project>
       <Name>Prototype.Xilinx</Name>
     </ProjectReference>
