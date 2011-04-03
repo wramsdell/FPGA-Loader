@@ -46,6 +46,12 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\FpgaFlashLoader\Prototype.Xilinx.Uploader.Arduino\Prototype.Xilinx.Uploader.Arduino.csproj">
+      <Project>{5F15A416-5FEA-4A35-9506-C87FDA585014}</Project>
+      <Name>Prototype.Xilinx.Uploader.Arduino</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

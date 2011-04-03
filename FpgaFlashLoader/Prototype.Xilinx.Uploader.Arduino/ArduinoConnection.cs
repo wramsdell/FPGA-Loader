@@ -1,5 +1,6 @@
 ﻿// Copyright (C) Prototype Engineering, LLC. All rights reserved.
 
+using System;
 using System.Collections;
 using System.IO.Ports;
 
@@ -8,6 +9,8 @@ namespace Prototype.Xilinx.Uploader.Arduino
     public class ArduinoConnection
     {
         private SerialPort arduinoPort;
+
+        private const int UserFieldLength = 64;
 
         public ArduinoConnection(string port, int speed)
         {
@@ -37,7 +40,10 @@ namespace Prototype.Xilinx.Uploader.Arduino
                 Open();
             }
             arduinoPort.Write(header, 0, 3);
-            arduinoPort.Write(buffer, offset, count);
+            if (count > 0)
+            {
+                arduinoPort.Write(buffer, offset, count);
+            }
             var response = arduinoPort.ReadLine();
             if (response.StartsWith("- "))
             {
@@ -67,6 +73,34 @@ namespace Prototype.Xilinx.Uploader.Arduino
                 throw;
             }
             System.Console.WriteLine();
+        }
+
+        public string ProgramSecurityRegisterUserFieldData(string userFieldString)
+        {
+            byte[] utf8Bytes = System.Text.Encoding.UTF8.GetBytes(userFieldString);
+            byte[] finalBytes = new byte[UserFieldLength];
+            if (utf8Bytes.Length > UserFieldLength)
+            {
+                throw new ArduinoConnectionException(String.Format("User field length cannot exceed {0:D} bytes", UserFieldLength));
+            }
+            Array.Copy(utf8Bytes, finalBytes, utf8Bytes.Length);
+            System.Console.Write("  ");
+            HexDump(finalBytes, 0, finalBytes.Length);
+            return TransmitBufferAndAwaitResponse(Commands.ProgramSecurityRegister, finalBytes, 0, finalBytes.Length);
+        }
+
+        private static void HexDump(byte[] bytes, int offset, int length)
+        {
+            for (int counter = 0; counter < length; ++counter)
+            {
+                System.Console.Write("{0:X2}", bytes[offset + counter]);
+            }
+            System.Console.WriteLine();
+        }
+
+        public string ReadSecurityRegister()
+        {
+            return TransmitBufferAndAwaitResponse(Commands.ReadSecurityRegister, null, 0, 0);
         }
 
         public bool IsOpen { get; set; }
