@@ -132,7 +132,7 @@ namespace Prototype.Xilinx.Uploader
                 false,
                 true,
                 1000,
-                SPI.SPI_module.SPI1
+                ShieldConfiguration.CurrentConfiguration.SpiModule
             );
             var spi = new SPI(spiConfig);
             var uploader = new Uploader(spi);

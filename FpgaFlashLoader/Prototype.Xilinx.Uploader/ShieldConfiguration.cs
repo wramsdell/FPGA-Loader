@@ -11,6 +11,7 @@ namespace Prototype.Xilinx.Uploader
         public Cpu.Pin GreenLedPin { get; set;  }
         public Cpu.Pin SpiChipSelectPin { get; set;  }
         public Cpu.Pin OnboardLedPin { get; set; }
+        public SPI.SPI_module SpiModule { get; set; }
 
         public class ShieldConfigurationException : System.Exception
         {
@@ -48,13 +49,22 @@ namespace Prototype.Xilinx.Uploader
             public const Cpu.Pin Di2 = (Cpu.Pin) 33;
         }
 
+        private static class ChipworkXConstants
+        {
+            public const Cpu.Pin PC5 = (Cpu.Pin) 69;
+            public const Cpu.Pin PA19 = (Cpu.Pin) 19;
+            public const Cpu.Pin PA21 = (Cpu.Pin) 21;
+            public const Cpu.Pin PA22 = (Cpu.Pin) 22;
+
+        }
         // Bootlader v1 configuration
         private static ShieldConfiguration OldNetduinoShieldConfiguration = new ShieldConfiguration
         {
             RedLedPin = NetduinoConstants.GPIO_PIN_D1,
             GreenLedPin = NetduinoConstants.GPIO_PIN_D2,
             SpiChipSelectPin = NetduinoConstants.GPIO_PIN_D0,
-            OnboardLedPin = NetduinoConstants.ONBOARD_LED
+            OnboardLedPin = NetduinoConstants.ONBOARD_LED,
+            SpiModule = SPI.SPI_module.SPI1
         };
 
         // Bootlader v2 configuration
@@ -63,7 +73,8 @@ namespace Prototype.Xilinx.Uploader
             RedLedPin = NetduinoConstants.GPIO_PIN_D3,
             GreenLedPin = NetduinoConstants.GPIO_PIN_D4,
             SpiChipSelectPin = NetduinoConstants.GPIO_PIN_D2,
-            OnboardLedPin = NetduinoConstants.ONBOARD_LED
+            OnboardLedPin = NetduinoConstants.ONBOARD_LED,
+            SpiModule = SPI.SPI_module.SPI1
         };
 
         private static ShieldConfiguration FezShieldConfiguration = new ShieldConfiguration
@@ -71,7 +82,17 @@ namespace Prototype.Xilinx.Uploader
             RedLedPin = FezConstants.Di3,
             GreenLedPin = FezConstants.Di4,
             SpiChipSelectPin = FezConstants.Di2,
-            OnboardLedPin = FezConstants.LED
+            OnboardLedPin = FezConstants.LED,
+            SpiModule = SPI.SPI_module.SPI1
+        };
+
+        private static ShieldConfiguration ChipworkXShieldConfiguration = new ShieldConfiguration
+        {
+            RedLedPin = ChipworkXConstants.PA21,
+            GreenLedPin = ChipworkXConstants.PA22,
+            SpiChipSelectPin = ChipworkXConstants.PA19,
+            OnboardLedPin = ChipworkXConstants.PC5,
+            SpiModule = SPI.SPI_module.SPI2
         };
 
         private class ShieldTableEntry
@@ -83,6 +104,7 @@ namespace Prototype.Xilinx.Uploader
         private static ArrayList shieldList = new ArrayList()
         {
             new ShieldTableEntry { Name = "GHI Electronics, LLC",   Configuration = FezShieldConfiguration },
+            //new ShieldTableEntry { Name = "GHI Electronics, LLC",   Configuration = ChipworkXShieldConfiguration },
             new ShieldTableEntry { Name = "Netduino",               Configuration = NetduinoShieldConfiguration },
         };
 
