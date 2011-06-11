@@ -70,6 +70,16 @@ namespace Prototype.Xilinx.Uploader
             throw new XilinxUploaderException("Timeout waiting for ISF READY status");
         }
 
+        public byte[] SecurityRegisterRead()
+        {
+            var securityRegisterBuffer = new byte[4 + Constants.SecurityRegisterTotalLength];
+
+            securityRegisterBuffer[0] = (byte) SpiCommands.SecurityRegisterRead;
+            spi.WriteRead(securityRegisterBuffer, securityRegisterBuffer);
+
+            return securityRegisterBuffer;
+        }
+
         public void UploadBitstream(PageCollection pageCollection)
         {
             foreach (Page page in pageCollection)
@@ -146,6 +156,11 @@ namespace Prototype.Xilinx.Uploader
 
                 try
                 {
+                    //var securityRegisterData = uploader.SecurityRegisterRead();
+                    //var userData = new byte[Constants.SecurityRegisterUserFieldLength];
+                    //Array.Copy(securityRegisterData, 4, userData, 0, userData.Length);
+                    //var userDataString = new string(System.Text.Encoding.UTF8.GetChars(userData));
+                    //Debug.Print("Programming \"" + userDataString + "\"");
                     uploadStatusIndicator.Status = UploadStatusIndicator.UploadStatus.Uploading;
                     uploader.UploadBitstream(pageCollection);
                     uploadStatusIndicator.Status = UploadStatusIndicator.UploadStatus.Succeeded;

@@ -17,5 +17,10 @@ namespace Prototype.Xilinx
         public static readonly byte StatusRegisterReadyMask = 0x80;
         public static readonly byte StatusRegisterCompareMask = 0x40;
         public static readonly byte StatusRegisterMemorySizeMask = 0x3C;
+
+        public static readonly int SecurityRegisterUserFieldLength = 64;
+        public static readonly int SecurityRegisterUniqueIdentifierLength = 64;
+        public static readonly int SecurityRegisterTotalLength = SecurityRegisterUserFieldLength +
+                                                                 SecurityRegisterUniqueIdentifierLength;
     }
 }
