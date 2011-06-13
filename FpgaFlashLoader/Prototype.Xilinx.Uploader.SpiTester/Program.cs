@@ -21,35 +21,21 @@ namespace Prototype.Xilinx.Uploader.SpiTester
             );
             var spi = new SPI(spiConfig);
             var statusBuffer = new byte[2];
-            var redFpgaLed = new OutputPort(ShieldConfiguration.CurrentConfiguration.RedLedPin, false);
-            var greenFpgaLed = new OutputPort(ShieldConfiguration.CurrentConfiguration.GreenLedPin, false);
 
-            // Just flash the FPGA LEDs so we know we're alive
-
-            greenFpgaLed.Write(true);
-            redFpgaLed.Write(false);
-            Thread.Sleep(500);
-            greenFpgaLed.Write(false);
-            redFpgaLed.Write(true);
-            Thread.Sleep(500);
-            greenFpgaLed.Write(true);
-            redFpgaLed.Write(false);
-            Thread.Sleep(500);
-            greenFpgaLed.Write(false);
-            redFpgaLed.Write(false);
-            Thread.Sleep(500);
-
-            // So the code is fairly simple. All we do is send the Status
-            // Register Read command to the FPGA ISF. If the status register
-            // looks right, we light the green LED. If it doesn't, we light
-            // the red LED.
+            // Watch the LEDs on UberShield. If they are showing the bootloader
+            // flashing pattern, there's no SPI connectivity. If the lights
+            // alternate off / red / green / redgreen then you're quad-winning.
+            // If they're off, you're not in bootloader mode.
 
             while (true)
             {
-                statusBuffer[0] = 0xD7;
-                spi.WriteRead(statusBuffer, statusBuffer);
-                greenFpgaLed.Write(statusBuffer[1] == 0x8C);
-                redFpgaLed.Write(statusBuffer[1] != 0x8C);
+                statusBuffer[0] = 0x01;
+                for (byte counter = 0; counter <= 3; ++counter)
+                {
+                    statusBuffer[1] = (byte)((counter << 2) | 0x03);
+                    spi.Write(statusBuffer);
+                    Thread.Sleep(500);
+                }
             }
         }
     }

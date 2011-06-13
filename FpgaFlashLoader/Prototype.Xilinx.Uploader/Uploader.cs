@@ -150,8 +150,7 @@ namespace Prototype.Xilinx.Uploader
             if (uploader.IsShieldInBootloaderMode())
             {
                 var uploadStatusIndicator = new UploadStatusIndicator(
-                    ShieldConfiguration.CurrentConfiguration.RedLedPin,
-                    ShieldConfiguration.CurrentConfiguration.GreenLedPin
+                    spi
                     );
 
                 try

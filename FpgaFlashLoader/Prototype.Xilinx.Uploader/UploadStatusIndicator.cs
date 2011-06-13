@@ -1,13 +1,14 @@
 // Copyright (C) Prototype Engineering, LLC. All rights reserved.
 
+using System;
 using Microsoft.SPOT.Hardware;
 
 namespace Prototype.Xilinx.Uploader
 {
     public class UploadStatusIndicator
     {
-        private OutputPort redFpgaLed;
-        private OutputPort greenFpgaLed;
+        private readonly SPI _spi;
+        private readonly byte[] _spiCommand = new byte[2];
 
         public enum UploadStatus
         {
@@ -17,36 +18,57 @@ namespace Prototype.Xilinx.Uploader
             Failed
         }
 
+        [Flags]
+        private enum UbershieldLedControlSpiParameter : byte
+        {
+            None = 0x00,
+            RedHostControl = 0x01,
+            GreenHostControl = 0x02,
+            RedOn = 0x04,
+            GreenOn = 0x08
+        }
+
+        private enum UbershieldSpiCommands : byte
+        {
+            None = 0x00,
+            LedControl = 0x01,
+            BootUserImage = 0x02
+        }
+
         public UploadStatus Status
         {
             set
             {
+                _spiCommand[1] =
+                    (byte) (UbershieldLedControlSpiParameter.RedHostControl | UbershieldLedControlSpiParameter.GreenHostControl);
                 switch (value)
                 {
                     case UploadStatus.None:
-                        redFpgaLed.Write(false);
-                        greenFpgaLed.Write(false);
                         break;
                     case UploadStatus.Failed:
-                        redFpgaLed.Write(true);
-                        greenFpgaLed.Write(false);
+                        _spiCommand[1] |=
+                            (byte)
+                            (UbershieldLedControlSpiParameter.RedOn);
                         break;
                     case UploadStatus.Succeeded:
-                        redFpgaLed.Write(false);
-                        greenFpgaLed.Write(true);
+                        _spiCommand[1] |=
+                            (byte)
+                            (UbershieldLedControlSpiParameter.GreenOn);
                         break;
                     case UploadStatus.Uploading:
-                        redFpgaLed.Write(true);
-                        greenFpgaLed.Write(true);
+                        _spiCommand[1] |=
+                            (byte)
+                            (UbershieldLedControlSpiParameter.RedOn | UbershieldLedControlSpiParameter.GreenOn);
                         break;
                 }
+                _spi.Write(_spiCommand);
             }
         }
 
-        public UploadStatusIndicator(Cpu.Pin redLedPin, Cpu.Pin greenLedPin)
+        public UploadStatusIndicator(SPI spi)
         {
-            redFpgaLed = new OutputPort(redLedPin, false);
-            greenFpgaLed = new OutputPort(greenLedPin, false);
+            _spi = spi;
+            _spiCommand[0] = 0x01;
             Status = UploadStatus.None;
         }
     }

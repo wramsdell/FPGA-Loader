@@ -8,8 +8,6 @@ namespace Prototype.Xilinx.Uploader
 {
     public class ShieldConfiguration
     {
-        public Cpu.Pin RedLedPin { get; set;  }
-        public Cpu.Pin GreenLedPin { get; set;  }
         public Cpu.Pin SpiChipSelectPin { get; set;  }
         public Cpu.Pin OnboardLedPin { get; set; }
         public SPI.SPI_module SpiModule { get; set; }
@@ -61,8 +59,6 @@ namespace Prototype.Xilinx.Uploader
         // Bootlader v1 configuration
         private static readonly ShieldConfiguration OldNetduinoShieldConfiguration = new ShieldConfiguration
         {
-            RedLedPin = NetduinoConstants.GPIO_PIN_D1,
-            GreenLedPin = NetduinoConstants.GPIO_PIN_D2,
             SpiChipSelectPin = NetduinoConstants.GPIO_PIN_D0,
             OnboardLedPin = NetduinoConstants.ONBOARD_LED,
             SpiModule = SPI.SPI_module.SPI1
@@ -71,8 +67,6 @@ namespace Prototype.Xilinx.Uploader
         // Bootlader v2 configuration
         private static readonly ShieldConfiguration NetduinoShieldConfiguration = new ShieldConfiguration
         {
-            RedLedPin = NetduinoConstants.GPIO_PIN_D3,
-            GreenLedPin = NetduinoConstants.GPIO_PIN_D4,
             SpiChipSelectPin = NetduinoConstants.GPIO_PIN_D2,
             OnboardLedPin = NetduinoConstants.ONBOARD_LED,
             SpiModule = SPI.SPI_module.SPI1
@@ -80,8 +74,6 @@ namespace Prototype.Xilinx.Uploader
 
         private static readonly ShieldConfiguration FezShieldConfiguration = new ShieldConfiguration
         {
-            RedLedPin = FezConstants.Di3,
-            GreenLedPin = FezConstants.Di4,
             SpiChipSelectPin = FezConstants.Di2,
             OnboardLedPin = FezConstants.LED,
             SpiModule = SPI.SPI_module.SPI1
@@ -89,8 +81,6 @@ namespace Prototype.Xilinx.Uploader
 
         private static readonly ShieldConfiguration ChipworkXShieldConfiguration = new ShieldConfiguration
         {
-            RedLedPin = ChipworkXConstants.PA21,
-            GreenLedPin = ChipworkXConstants.PA22,
             SpiChipSelectPin = ChipworkXConstants.PA19,
             OnboardLedPin = ChipworkXConstants.PC5,
             SpiModule = SPI.SPI_module.SPI2
