@@ -1,5 +1,6 @@
 // Copyright (C) Prototype Engineering, LLC. All rights reserved.
 
+using System;
 using System.Collections;
 using Microsoft.SPOT.Hardware;
 
@@ -13,24 +14,22 @@ namespace Prototype.Xilinx.Uploader
         public Cpu.Pin OnboardLedPin { get; set; }
         public SPI.SPI_module SpiModule { get; set; }
 
-        public class ShieldConfigurationException : System.Exception
+        public class ShieldConfigurationException : Exception
         {
             public ShieldConfigurationException()
-                : base()
             {
             }
 
-            public ShieldConfigurationException(string message)
-                : base(message)
+            public ShieldConfigurationException(string message) : base(message)
             {
             }
 
-            public ShieldConfigurationException(string message, System.Exception innerException)
-                : base(message, innerException)
+            public ShieldConfigurationException(string message, Exception innerException) : base(message, innerException)
             {
             }
         }
 
+// ReSharper disable InconsistentNaming
         private static class NetduinoConstants
         {
             public const Cpu.Pin GPIO_PIN_D0 = (Cpu.Pin) 27;
@@ -57,8 +56,10 @@ namespace Prototype.Xilinx.Uploader
             public const Cpu.Pin PA22 = (Cpu.Pin) 22;
 
         }
+// ReSharper restore InconsistentNaming
+
         // Bootlader v1 configuration
-        private static ShieldConfiguration OldNetduinoShieldConfiguration = new ShieldConfiguration
+        private static readonly ShieldConfiguration OldNetduinoShieldConfiguration = new ShieldConfiguration
         {
             RedLedPin = NetduinoConstants.GPIO_PIN_D1,
             GreenLedPin = NetduinoConstants.GPIO_PIN_D2,
@@ -68,7 +69,7 @@ namespace Prototype.Xilinx.Uploader
         };
 
         // Bootlader v2 configuration
-        private static ShieldConfiguration NetduinoShieldConfiguration = new ShieldConfiguration
+        private static readonly ShieldConfiguration NetduinoShieldConfiguration = new ShieldConfiguration
         {
             RedLedPin = NetduinoConstants.GPIO_PIN_D3,
             GreenLedPin = NetduinoConstants.GPIO_PIN_D4,
@@ -77,7 +78,7 @@ namespace Prototype.Xilinx.Uploader
             SpiModule = SPI.SPI_module.SPI1
         };
 
-        private static ShieldConfiguration FezShieldConfiguration = new ShieldConfiguration
+        private static readonly ShieldConfiguration FezShieldConfiguration = new ShieldConfiguration
         {
             RedLedPin = FezConstants.Di3,
             GreenLedPin = FezConstants.Di4,
@@ -86,7 +87,7 @@ namespace Prototype.Xilinx.Uploader
             SpiModule = SPI.SPI_module.SPI1
         };
 
-        private static ShieldConfiguration ChipworkXShieldConfiguration = new ShieldConfiguration
+        private static readonly ShieldConfiguration ChipworkXShieldConfiguration = new ShieldConfiguration
         {
             RedLedPin = ChipworkXConstants.PA21,
             GreenLedPin = ChipworkXConstants.PA22,
@@ -101,14 +102,14 @@ namespace Prototype.Xilinx.Uploader
             public ShieldConfiguration Configuration { get; set; }
         }
 
-        private static ArrayList shieldList = new ArrayList()
+        private static readonly ArrayList ShieldList = new ArrayList
         {
             new ShieldTableEntry { Name = "GHI Electronics, LLC",   Configuration = FezShieldConfiguration },
             //new ShieldTableEntry { Name = "GHI Electronics, LLC",   Configuration = ChipworkXShieldConfiguration },
             new ShieldTableEntry { Name = "Netduino",               Configuration = NetduinoShieldConfiguration },
         };
 
-        private static ShieldConfiguration shieldConfiguration;
+        private static ShieldConfiguration _shieldConfiguration;
 
         // SetupCurrentShieldConfiguration is a little fragile -- it uses
         // Microsoft.SPOT.Hardware.SystemInfo.OEMString to try and figure out
@@ -119,25 +120,25 @@ namespace Prototype.Xilinx.Uploader
         {
             get
             {
-                if (shieldConfiguration == null)
+                if (_shieldConfiguration == null)
                 {
                     var oemString = SystemInfo.OEMString;
 
-                    foreach (ShieldTableEntry entry in shieldList)
+                    foreach (ShieldTableEntry entry in ShieldList)
                     {
                         if (oemString.IndexOf(entry.Name) > -1)
                         {
-                            shieldConfiguration = entry.Configuration;
+                            _shieldConfiguration = entry.Configuration;
                         }
                     }
 
-                    if (shieldConfiguration == null)
+                    if (_shieldConfiguration == null)
                     {
                         throw new ShieldConfigurationException("Unable to identify board \"" + oemString + "\"");
                     }
                 }
 
-                return shieldConfiguration;
+                return _shieldConfiguration;
             }
         }
     }
