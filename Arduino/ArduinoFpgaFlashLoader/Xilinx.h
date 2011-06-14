@@ -16,6 +16,7 @@ class Xilinx
     bool upload_page(byte* page_data);
     byte* security_register_read();
     bool security_register_program(const byte* user_field_data);
+    bool set_leds(byte led_state);
 
   private:
     byte get_status_register();

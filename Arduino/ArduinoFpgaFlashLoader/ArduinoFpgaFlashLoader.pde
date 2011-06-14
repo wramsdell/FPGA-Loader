@@ -13,14 +13,6 @@ const byte COMMAND_SET_LEDS    = 0x02;
 const byte COMMAND_READ_SECURITY_REGISTER = 0x03;
 const byte COMMAND_PROGRAM_SECURITY_REGISTER = 0x04;
 
-const byte GREEN_LED_MASK = 0b00000001;
-const byte RED_LED_MASK   = 0b00000010;
-
-const int fpga_red_led_pin   = 3;
-const int fpga_green_led_pin = 4;
-
-static bool leds_set_up = false;
-
 void setup()
 {
   Serial.begin(115200);
@@ -51,16 +43,7 @@ void loop()
             break;
 
           case COMMAND_SET_LEDS:
-            if (!leds_set_up)
-            {
-              pinMode(fpga_green_led_pin, OUTPUT);
-              pinMode(fpga_red_led_pin, OUTPUT);
-
-              leds_set_up = true;
-            }
-
-            digitalWrite(fpga_green_led_pin, ((block.get_data()[0] & GREEN_LED_MASK) != 0) ? HIGH : LOW);
-            digitalWrite(fpga_red_led_pin, ((block.get_data()[0] & RED_LED_MASK) != 0) ? HIGH : LOW);
+            xilinx.set_leds(block.get_data()[0]);
 
             status_report_success("LED state changed");
             break;

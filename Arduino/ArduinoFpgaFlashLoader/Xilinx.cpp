@@ -22,6 +22,9 @@ const byte xilinx_spi_status_register_memory_size_one_megabit = 0b00001100;
 
 const int xilinx_max_verify_failed_count = 3;
 
+const byte GREEN_LED_MASK = 0b00000001;
+const byte RED_LED_MASK   = 0b00000010;
+
 Xilinx::Xilinx()
 {
   SPI.begin();
@@ -170,5 +173,18 @@ bool Xilinx::security_register_program(const byte* user_field_data)
   }
   digitalWrite(xilinx_spi_chip_select_pin, HIGH);
   return true;
+}
+
+bool Xilinx::set_leds(byte led_state)
+{
+  byte byte_to_send = 0x03;
+
+  byte_to_send |= ((led_state & GREEN_LED_MASK) != 0) ? 0b00001000 : 0;
+  byte_to_send |= ((led_state & RED_LED_MASK) != 0) ? 0b00000100 : 0;
+
+  digitalWrite(xilinx_spi_chip_select_pin, LOW);
+  SPI.transfer(0x01);
+  SPI.transfer(byte_to_send);
+  digitalWrite(xilinx_spi_chip_select_pin, HIGH);
 }
 
