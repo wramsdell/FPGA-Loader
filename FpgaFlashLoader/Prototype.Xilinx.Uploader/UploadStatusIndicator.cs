@@ -68,7 +68,7 @@ namespace Prototype.Xilinx.Uploader
         public UploadStatusIndicator(SPI spi)
         {
             _spi = spi;
-            _spiCommand[0] = 0x01;
+            _spiCommand[0] = (byte) UbershieldSpiCommands.LedControl;
             Status = UploadStatus.None;
         }
     }
