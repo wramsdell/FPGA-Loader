@@ -34,6 +34,7 @@
     <Compile Include="BitFileHeader.cs" />
     <Compile Include="BitFilePageCollection.cs" />
     <Compile Include="IsfMemorySize.cs" />
+    <Compile Include="ISpi.cs" />
     <Compile Include="Page.cs" />
     <Compile Include="PageCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

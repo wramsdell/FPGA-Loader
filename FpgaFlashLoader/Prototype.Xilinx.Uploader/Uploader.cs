@@ -10,11 +10,11 @@ namespace Prototype.Xilinx.Uploader
 {
     public class Uploader
     {
-        private SPI spi;
+        private ISpi spi;
         private byte[] statusBuffer;
         private static readonly int MaxPageWriteRetries = 3;
 
-        public Uploader(SPI spi)
+        public Uploader(ISpi spi)
         {
             this.spi = spi;
             statusBuffer = new byte[2];
@@ -97,7 +97,7 @@ namespace Prototype.Xilinx.Uploader
 
                     page.Data[page.Offset] = (byte)SpiCommands.PageProgramThroughBuffer1;
 
-                    spi.WriteRead(page.Data, page.Offset, Constants.SramPageBufferSize + 4, null, 0, 0, 0);
+                    spi.Write(page.Data, page.Offset, Constants.SramPageBufferSize + 4);
 
                     // Wait until ready
 
@@ -107,7 +107,7 @@ namespace Prototype.Xilinx.Uploader
 
                     page.Data[page.Offset] = (byte)SpiCommands.PageToBuffer1Compare;
 
-                    spi.WriteRead(page.Data, page.Offset, 4, null, 0, 0, 0);
+                    spi.Write(page.Data, page.Offset, 4);
 
                     // Wait until ready, and when it is, the compare result
                     // comes back in bit 6. Set is bad.
@@ -144,7 +144,7 @@ namespace Prototype.Xilinx.Uploader
                 1000,
                 ShieldConfiguration.CurrentConfiguration.SpiModule
             );
-            var spi = new SPI(spiConfig);
+            var spi = new SpotSpi(spiConfig);
             var uploader = new Uploader(spi);
 
             if (uploader.IsShieldInBootloaderMode())

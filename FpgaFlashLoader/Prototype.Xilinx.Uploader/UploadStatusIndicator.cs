@@ -1,13 +1,12 @@
 // Copyright (C) Prototype Engineering, LLC. All rights reserved.
 
 using System;
-using Microsoft.SPOT.Hardware;
 
 namespace Prototype.Xilinx.Uploader
 {
     public class UploadStatusIndicator
     {
-        private readonly SPI _spi;
+        private readonly ISpi _spi;
         private readonly byte[] _spiCommand = new byte[2];
 
         public enum UploadStatus
@@ -65,7 +64,7 @@ namespace Prototype.Xilinx.Uploader
             }
         }
 
-        public UploadStatusIndicator(SPI spi)
+        public UploadStatusIndicator(ISpi spi)
         {
             _spi = spi;
             _spiCommand[0] = (byte) UbershieldSpiCommands.LedControl;
